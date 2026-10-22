@@ -17,5 +17,13 @@ var TOOLS = [
     file: 'tools/byte-converter.html',
     accent: '#0071e3',
     icon: 'byte'
+  },
+  {
+    id: 'watermark',
+    name: '图片水印',
+    desc: '批量加水印，样式统一，导出按像素缩放',
+    file: 'tools/watermark.html',
+    accent: '#5e5ce6',
+    icon: 'image'
   }
 ];
