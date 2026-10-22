@@ -1641,6 +1641,16 @@
     new ResizeObserver(queueRender).observe(stageInner);
   }
 
+  // 本地 file:// 直接打开时没有工具首页，返回链接失效，降级为纯展示
+  if(location.protocol === 'file:'){
+    var back = document.querySelector('.brand');
+    if(back){
+      back.removeAttribute('href');
+      back.removeAttribute('title');
+      back.style.cursor = 'default';
+    }
+  }
+
   buildThumbs();
   syncAll();
 })();
