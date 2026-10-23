@@ -26,14 +26,15 @@ git clone https://github.com/ooghoo/htools.git
 ```
 
 - 打开全部工具：双击根目录 `index.html`
-- 只用一个工具：直接双击 `tools/` 里对应的 `.html`（每个工具页左上角有返回首页入口）
+- 只用一个工具：直接双击 `tools/` 里对应的 `.html`（工具页顶栏左侧有「←」返回，侧栏可回首页 / 跳转其它工具）
 
 ## ➕ 新增一个工具
 
 三步，不需要改首页：
 
-1. 把写好的单文件工具放进 `tools/`，例如 `tools/json-format.html`
-2. 在根目录 **`tools.js`** 的 `TOOLS` 数组里追加一条：
+1. 复制 **`tools/_template.html`** 为你的工具页，例如 `tools/json-format.html`
+2. 把模版里 `<div class="tool-body">` 的内容换成你的工具 UI（可用模版内置的共享组件，见下）
+3. 在根目录 **`tools.js`** 的 `TOOLS` 数组里追加一条：
 
    ```js
    {
@@ -46,13 +47,28 @@ git clone https://github.com/ooghoo/htools.git
    }
    ```
 
-3. 工具页左上角加一个返回首页的链接，保持来回导航一致：
+注册后，首页卡片、工具页页头（图标 / 名称 / 描述 / 文件路径）、侧栏高亮都会自动生成，不用手动写返回链接。
 
-   ```html
-   <a class="back" href="../index.html">← 全部工具</a>
-   ```
+## 🧩 工具页模版（tools/_template.html）
 
-约定：**一个工具 = 一个自包含的 `.html`**，样式和脚本内联，不引外部 CDN，保证离线可用。
+所有工具页统一套 `tools/_template.html`：与首页同一套外壳（顶栏 + 侧栏 + 内容面板）、同一套 token、同一套深浅色机制。模版内置共享组件，工具 UI 直接组合使用：
+
+| 组件 | 用途 |
+| --- | --- |
+| `ca-card` | 内容卡片（`ca-card--narrow` 为居中窄卡） |
+| `ca-input` / `ca-select` | 输入框 / 下拉（高 36） |
+| `ca-seg` | 分段切换（如 Windows / Mac） |
+| `ca-btn` / `ca-btn--primary` | 次按钮 / 主按钮 |
+| `ca-rows` / `ca-row` | 结果列表（分隔线 + hover + 行内操作） |
+| `ca-note` / `ca-kbd` / `ca-badge` | 说明 / 键帽 / 徽标 |
+| `ca-empty` | 空状态 |
+
+约定：
+
+- **一个工具 = 一个自包含的 `.html`**，样式和脚本内联，不引外部 CDN，保证离线可用
+- 样式只用共享 token 与 `ca-*` 组件；需要局部别名时用 `--t-` 前缀，不要重定义 token 名（`--card` / `--accent` 等），会撞车
+- 深浅色、返回首页、侧栏导航模版已内置，工具页不用自己处理
+- 参考实现：`tools/byte-converter.html`
 
 ## 📦 自行部署
 

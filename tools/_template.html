@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>工具名称 · htools</title>
+<meta name="description" content="工具描述 —— 一句话说明这个工具做什么。">
+<meta name="theme-color" content="#fbfbfc" id="meta-theme">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230071e3'/><path d='M13 12l-2.5 4L13 20M19 12l2.5 4L19 20' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<!--
+  ============================================================
+  htools 工具详情页模版（CloudAI 控制台风格）
+  ------------------------------------------------------------
+  新工具三步走：
+  1. 复制本文件为 tools/your-tool.html
+  2. 替换 <div class="tool-body"> 里的内容为你的工具 UI
+     （可用下面的共享组件：ca-card / ca-input / ca-select /
+      ca-seg / ca-btn / ca-row / ca-note / ca-empty …）
+  3. 在根目录 tools.js 的 TOOLS 数组注册一条
+     （页头图标、名称、描述、侧栏高亮会自动从注册表读取）
+
+  约定：
+  - 样式只用共享 token 与 ca-* 组件，不引外部 CDN，保证离线可用
+  - 需要局部别名时用 --t- 前缀（如 --t-xxx: var(--muted)），
+     不要重定义 token 名（--card / --accent 等），会撞车
+  - 顶栏「←」与侧栏「返回首页」已内置，不用自己写返回链接
+  - 深浅色自动跟随系统 / 用户在首页的选择，无需处理
+  ============================================================
+-->
+<script>
+  /* 主题预置：跟随系统或用户此前的选择，防刷新闪屏 */
+  (function () {
+    var de = document.documentElement;
+    de.classList.add('js');
+    try {
+      var t = localStorage.getItem('htools:theme');
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      de.setAttribute('data-theme', t);
+      var m = document.getElementById('meta-theme');
+      if (m) m.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#fbfbfc');
+    } catch (e) {}
+  })();
+</script>
+<style>
+  /* ============================================================
+     设计 token：CloudAI aidbs 主题（Light / Dark 实际取值）
+     与首页、其它工具页完全一致，勿单独改动
+     ============================================================ */
+  :root {
+    color-scheme: light;
+
+    --background: hsl(0 0% 98.82%);
+    --background-95: hsl(0 0% 98.82% / .95);
+    --card: hsl(0 0% 100%);
+    --card-foreground: hsl(240 4.76% 4.12%);
+    --foreground: hsl(240 4.76% 4.12%);
+    --muted: hsl(240 9.09% 95.69%);
+    --muted-foreground: hsl(240 1.1% 64.31%);
+    --secondary-foreground: hsl(240 4.76% 4.12%);
+    --accent: hsl(240 9.09% 95.69%);          /* 交互高亮灰底（hover 用） */
+    --accent-foreground: hsl(240 4.55% 8.63%);
+    --border: hsl(220 5.66% 89.61%);
+    --input: hsl(220 5.66% 89.61%);
+    --ring: hsl(240 1.1% 64.31%);
+    --primary: hsl(0 0% 9.02%);               /* 主按钮：亮色下为黑 */
+    --primary-foreground: hsl(0 0% 98.04%);
+    --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(240 4.76% 4.12%);
+
+    /* Brand：只作品牌识别与强调，不替代 Primary */
+    --brand: hsl(235.65 84.93% 71.37%);
+    --brand-1: hsl(240 100% 98.43%);          /* 选中 / 高亮底 */
+    --brand-2: hsl(236.25 94.12% 93.33%);
+    --brand-6: hsl(235.65 84.93% 71.37%);
+    --brand-foreground: hsl(236.82 73.33% 64.71%); /* 强调文字 / 链接 */
+
+    --sidebar-foreground: hsl(240 13.95% 16.86%);
+    --sidebar-accent: hsl(240 18.18% 95.69%);
+    --sidebar-accent-foreground: hsl(240 13.95% 16.86%);
+
+    --radius: 8px;
+    --radius-card: 12px;
+    --radius-panel: 20px;
+
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", "Segoe UI", sans-serif;
+    --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+
+    --background: hsl(0 0% 3.92%);
+    --background-95: hsl(0 0% 3.92% / .95);
+    --card: hsl(0 0% 9.02%);
+    --card-foreground: hsl(0 0% 98.04%);
+    --foreground: hsl(0 0% 98.04%);
+    --muted: hsl(0 0% 14.9%);
+    --muted-foreground: hsl(240 0.83% 52.55%);
+    --secondary-foreground: hsl(0 0% 98.04%);
+    --accent: hsl(0 0% 25.1%);
+    --accent-foreground: hsl(0 0% 98.04%);
+    --border: hsl(0 0% 14.9%);
+    --input: hsl(0 0% 14.9%);
+    --ring: hsl(0 0% 45.1%);
+    --primary: hsl(0 0% 89.8%);               /* 主按钮：暗色下为白 */
+    --primary-foreground: hsl(0 0% 9.02%);
+    --popover: hsl(0 0% 14.9%);
+    --popover-foreground: hsl(0 0% 98.04%);
+
+    --brand: hsl(234.88 93.18% 82.75%);
+    --brand-1: hsl(237.45 47.47% 19.41%);
+    --brand-2: hsl(236.57 48.61% 28.24%);
+    --brand-6: hsl(234.88 93.18% 82.75%);
+    --brand-foreground: hsl(235.79 93.44% 88.04%);
+
+    --sidebar-foreground: hsl(264 100% 99.02%);
+    --sidebar-accent: hsl(0 0% 14.9%);
+    --sidebar-accent-foreground: hsl(0 0% 98.04%);
+  }
+
+  /* ================= 基础 ================= */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { touch-action: manipulation; font-family: inherit; }
+  a { color: inherit; }
+  ::selection { background: hsl(235.65 84.93% 71.37% / .28); }
+
+  /* ============================================================
+     AppShell：整页不滚，滚动只发生在 ContentArea 内部
+     ============================================================ */
+  .shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: linear-gradient(to bottom, var(--card) 0%, var(--brand-1) 52%, var(--brand-2) 100%);
+  }
+
+  /* ---------- TopBar：高 56，常驻不滚 ---------- */
+  .topbar {
+    flex-shrink: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
+  }
+  .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .tbtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--foreground);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background-color .15s, color .15s, transform .1s;
+  }
+  .tbtn:hover { background: var(--accent); }
+  .tbtn:active { transform: scale(.92); }
+  .tbtn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
+  .tbtn svg { width: 16px; height: 16px; }
+
+  .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--foreground); }
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--foreground);
+    color: var(--background);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-mark svg { width: 14px; height: 14px; }
+  .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+
+  .tbar-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+  .tbar-label { font-size: 13px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 深浅色切换：日月图标交叉淡入淡出 */
+  .theme-btn { position: relative; }
+  .theme-btn .i {
+    position: absolute;
+    display: inline-flex;
+    transition: opacity .25s, transform .3s;
+  }
+  .theme-btn .i-moon { opacity: 1; transform: none; }
+  .theme-btn .i-sun { opacity: 0; transform: rotate(-90deg) scale(.5); }
+  html[data-theme="dark"] .theme-btn .i-moon { opacity: 0; transform: rotate(90deg) scale(.5); }
+  html[data-theme="dark"] .theme-btn .i-sun { opacity: 1; transform: none; }
+
+  /* ---------- 主体行：左右下外距 12、间隙 8，无上外距 ---------- */
+  .main-row {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 8px;
+    padding: 0 max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  /* ---------- Sidebar：展开 248，收起整块移出布局（不是图标栏） ---------- */
+  .sidebar {
+    display: none;
+    width: 248px;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 8px 12px;
+  }
+  .shell[data-sidebar="open"] .sidebar { display: flex; }
+  .sidebar-nav {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .side-group { display: flex; flex-direction: column; gap: 2px; }
+  .side-label { font-size: 12px; color: var(--muted-foreground); padding: 4px 8px; }
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--sidebar-foreground);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color .15s, color .15s;
+  }
+  .side-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--secondary-foreground); }
+  .side-item:hover { background: var(--sidebar-accent); }
+  .side-item.is-active { background: var(--brand-1); color: var(--sidebar-accent-foreground); font-weight: 500; }
+  .side-item .ext { width: 12px; height: 12px; margin-left: auto; opacity: .55; flex-shrink: 0; }
+  .side-item .side-dot {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: var(--t-accent, var(--brand)); /* 工具图标同色小圆点，JS 注入 */
+    flex-shrink: 0;
+  }
+  .side-foot { flex-shrink: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted-foreground); padding: 0 8px; }
+
+  /* ---------- ContentArea：唯一主滚动容器 ---------- */
+  .content {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--brand-2);
+    border-radius: var(--radius-panel);
+    background: var(--background-95);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    overflow: hidden;
+  }
+  .content-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+  .content-mask {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 88px;
+    background: linear-gradient(to bottom, transparent, var(--background));
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     PageContent：工具详情
+     ============================================================ */
+  .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
+
+  /* ---------- 页头：图标 + 名称 + 描述 + 文件路径 ---------- */
+  .detail-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .detail-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .detail-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    flex-shrink: 0;
+    background-image: linear-gradient(150deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 62%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
+  }
+  .detail-icon svg { width: 22px; height: 22px; }
+  .detail-id h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; }
+  .detail-desc { margin-top: 2px; font-size: 13px; color: var(--muted-foreground); }
+  .detail-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .detail-file {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border-radius: 6px;
+    padding: 4px 9px;
+    white-space: nowrap;
+  }
+
+  /* ---------- 工具内容区（把工具的 UI 放在这里） ---------- */
+  .tool-body { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ============================================================
+     共享组件（ca-*）：所有工具页统一使用
+     ============================================================ */
+
+  /* 卡片 */
+  .ca-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: clamp(16px, 2.4vw, 24px);
+  }
+  .ca-card--narrow { max-width: 560px; width: 100%; margin: 0 auto; }
+  .ca-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ca-card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .ca-card-sub { font-size: 12.5px; color: var(--muted-foreground); margin-top: 2px; }
+
+  /* 控件行 */
+  .ca-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+  .ca-field { display: flex; flex-direction: column; min-width: 0; }
+  .ca-field--grow { flex: 1; }
+  .ca-label { font-size: 12px; color: var(--muted-foreground); margin-bottom: 6px; }
+
+  /* 输入框 / 下拉：高 36 */
+  .ca-input, .ca-select {
+    height: 36px;
+    border: 1px solid var(--input);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0 12px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ca-input:focus, .ca-select:focus { border-color: var(--ring); box-shadow: 0 0 0 2px var(--ring); }
+  .ca-input::placeholder { color: var(--muted-foreground); }
+  .ca-input[type="number"] { font-variant-numeric: tabular-nums; }
+  .ca-select {
+    padding-right: 32px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%238e8e96' stroke-width='1.5' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  html[data-theme="dark"] .ca-select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%2389898f' stroke-width='1.5' stroke-linecap='round'/></svg>");
+  }
+
+  /* 分段控件 */
+  .ca-seg { display: inline-flex; gap: 2px; padding: 2px; background: var(--muted); border-radius: 6px; }
+  .ca-seg-btn {
+    height: 28px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted-foreground);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color .15s, color .15s, transform .1s;
+  }
+  .ca-seg-btn svg { width: 13px; height: 13px; }
+  .ca-seg-btn:hover { color: var(--foreground); }
+  .ca-seg-btn:active { transform: scale(.96); }
+  .ca-seg-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
+  .ca-seg-btn.is-active { background: var(--card); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+
+  /* 按钮：主按钮黑（亮色）/ 白（暗色），次按钮描边 */
+  .ca-btn {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--foreground);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color .15s, color .15s, transform .1s;
+  }
+  .ca-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .ca-btn:hover { background: var(--accent); }
+  .ca-btn:active { transform: scale(.97); }
+  .ca-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
+  .ca-btn--primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+  .ca-btn--primary:hover { background: var(--primary); opacity: .88; }
+
+  /* 列表行（结果 / 明细）：分隔线 + hover 高亮 + 行内操作 */
+  .ca-rows { display: flex; flex-direction: column; }
+  .ca-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    transition: background-color .15s;
+  }
+  .ca-row + .ca-row { border-top: 1px solid var(--border); }
+  .ca-row:hover { background: var(--muted); }
+  .ca-row-label { font-size: 13.5px; font-weight: 500; flex-shrink: 0; }
+  .ca-row-label small { font-size: 11px; font-weight: 400; color: var(--muted-foreground); margin-left: 5px; }
+  .ca-row-value {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ca-row-value--mono { font-family: var(--mono); font-size: 13px; }
+  .ca-row.is-active { background: var(--brand-1); }
+  .ca-row.is-active .ca-row-label { color: var(--brand-foreground); }
+  .ca-row-action {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .15s, background-color .15s, color .15s;
+  }
+  .ca-row-action svg { width: 14px; height: 14px; }
+  .ca-row:hover .ca-row-action { opacity: 1; }
+  .ca-row-action:hover { background: var(--muted); color: var(--foreground); }
+  .ca-row-action.is-done { opacity: 1; color: var(--brand-foreground); }
+  @media (hover: none) { .ca-row-action { opacity: 1; } }
+
+  /* 说明文字 / 行内代码 / 键帽 */
+  .ca-note { font-size: 12px; line-height: 1.6; color: var(--muted-foreground); }
+  .ca-note code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--muted);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .ca-kbd {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0 5px;
+    line-height: 16px;
+  }
+
+  /* 徽标（品牌底，仅作品牌/状态标记） */
+  .ca-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--brand-1);
+    color: var(--brand-6);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .ca-badge svg { width: 12px; height: 12px; }
+
+  /* 空状态 */
+  .ca-empty {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-card);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .ca-empty-title { font-size: 14px; font-weight: 600; }
+  .ca-empty-desc { margin-top: 4px; font-size: 12.5px; color: var(--muted-foreground); }
+
+  /* ---------- 窄屏：顶栏精简 ---------- */
+  @media (max-width: 640px) {
+    .tbar-sep, .tbar-label { display: none; }
+  }
+
+  /* ---------- 移动端侧栏：覆盖抽屉 + 背景挡板 ---------- */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 56px 0 0 0;
+    background: rgb(0 0 0 / .32);
+    z-index: 40;
+  }
+  @media (max-width: 767px) {
+    .shell[data-sidebar="open"] .sidebar {
+      position: fixed;
+      top: 68px;
+      left: 12px;
+      bottom: 12px;
+      width: 248px;
+      z-index: 50;
+      background: var(--popover);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: 0 24px 48px rgb(0 0 0 / .18);
+      padding: 12px 8px;
+    }
+    .shell[data-sidebar="open"] .sidebar-backdrop { display: block; }
+  }
+  @media (min-width: 768px) { .sidebar-backdrop { display: none !important; } }
+
+  /* ================= 动效减弱 ================= */
+  @media (prefers-reduced-motion: reduce) {
+    .tbtn, .tbtn:active, .ca-btn, .ca-btn:active, .ca-seg-btn, .ca-seg-btn:active,
+    .theme-btn .i, .side-item, .ca-row, .ca-row-action, .ca-input, .ca-select {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="shell" id="shell" data-sidebar="closed">
+    <!-- ================= TopBar ================= -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <a class="tbtn" href="../index.html" aria-label="返回首页">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+        <button class="tbtn" id="sidebar-toggle" aria-label="展开侧栏" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
+          </span>
+          <span class="brand-name">htools</span>
+        </a>
+        <span class="tbar-sep" aria-hidden="true"></span>
+        <span class="tbar-label" id="tbar-label">工具名称</span>
+      </div>
+      <div class="topbar-actions">
+        <a class="tbtn" href="https://github.com/ooghoo/htools" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+        <button class="tbtn theme-btn" id="theme-toggle" aria-label="切换深浅色模式">
+          <span class="i i-moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 8.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+          <span class="i i-sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= 主体行 ================= -->
+    <div class="main-row">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar" aria-label="侧栏导航">
+        <nav class="sidebar-nav">
+          <div class="side-group">
+            <p class="side-label">导航</p>
+            <a class="side-item" href="../index.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              返回首页
+            </a>
+            <a class="side-item" href="../index.html#tools">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              全部工具
+            </a>
+          </div>
+          <!-- 工具列表：由 tools.js 注册表生成，当前页高亮 -->
+          <div class="side-group" id="side-tools" hidden>
+            <p class="side-label">工具</p>
+          </div>
+        </nav>
+        <p class="side-foot">© 2026 ooghoo<br>Hosted on GitHub Pages</p>
+      </aside>
+
+      <!-- ContentArea -->
+      <main class="content">
+        <div class="content-scroll">
+          <div class="page">
+            <!-- 页头：注册表命中时由 JS 填充，未命中时用下面的占位文案 -->
+            <div class="detail-head">
+              <div class="detail-id">
+                <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </span>
+                <div>
+                  <h1 id="detail-name">工具名称</h1>
+                  <p class="detail-desc" id="detail-desc">一句话描述这个工具做什么。</p>
+                </div>
+              </div>
+              <div class="detail-meta">
+                <span class="detail-file" id="detail-file">tools/your-tool.html</span>
+              </div>
+            </div>
+
+            <!-- ========== 工具内容区：替换成你的工具 UI ========== -->
+            <div class="tool-body">
+              <div class="ca-card">
+                <div class="ca-card-head">
+                  <div>
+                    <p class="ca-card-title">共享组件示例</p>
+                    <p class="ca-card-sub">下面是模板内置组件，替换工具内容时整块删除</p>
+                  </div>
+                  <span class="ca-badge">示例</span>
+                </div>
+                <div class="ca-toolbar" style="margin-bottom:14px">
+                  <div class="ca-field ca-field--grow">
+                    <label class="ca-label" for="demo-input">输入框</label>
+                    <input class="ca-input" id="demo-input" type="text" placeholder="输入点什么…">
+                  </div>
+                  <div class="ca-field">
+                    <label class="ca-label" for="demo-select">下拉</label>
+                    <select class="ca-select" id="demo-select">
+                      <option>选项一</option>
+                      <option>选项二</option>
+                    </select>
+                  </div>
+                  <div class="ca-field">
+                    <span class="ca-label">分段</span>
+                    <div class="ca-seg">
+                      <button class="ca-seg-btn is-active" type="button">开</button>
+                      <button class="ca-seg-btn" type="button">关</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="ca-toolbar" style="margin-bottom:16px">
+                  <button class="ca-btn ca-btn--primary" type="button">主按钮</button>
+                  <button class="ca-btn" type="button">次按钮</button>
+                  <span class="ca-kbd">/</span>
+                </div>
+                <div class="ca-rows">
+                  <div class="ca-row">
+                    <span class="ca-row-label">列表行 <small>label</small></span>
+                    <span class="ca-row-value ca-row-value--mono">128.00</span>
+                    <button class="ca-row-action" type="button" aria-label="复制">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>
+                    </button>
+                  </div>
+                  <div class="ca-row is-active">
+                    <span class="ca-row-label">选中行 <small>is-active</small></span>
+                    <span class="ca-row-value">1,024.00</span>
+                    <button class="ca-row-action" type="button" aria-label="复制">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="ca-note" style="margin-top:14px">
+                  说明文字用 <code>.ca-note</code>，空状态用 <code>.ca-empty</code>，窄卡片加 <code>.ca-card--narrow</code>。
+                </p>
+              </div>
+            </div>
+            <!-- ========== 工具内容区结束 ========== -->
+          </div>
+        </div>
+        <div class="content-mask" aria-hidden="true"></div>
+      </main>
+    </div>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+  </div>
+
+<script src="../tools.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- 工具图标库（与首页保持一致） ---------- */
+  var ICONS = {
+    byte: '<ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/><path d="M4.5 11.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    code: '<path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/>',
+    text: '<path d="M4 6.5V5h16v1.5M12 5v14M8.5 19h7"/>',
+    time: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.5 2"/>',
+    color: '<path d="M12 3.5c4.7 0 8.5 3.4 8.5 7.6 0 2.6-2 4.4-4.4 4.4h-2.3c-1 0-1.6.7-1.6 1.6 0 .5.2.9.2 1.4 0 .9-.7 1.5-1.5 1.5-4.4 0-7.9-3.7-7.9-8.2C3 6.9 6.9 3.5 12 3.5z"/><circle cx="8" cy="9.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="9.5" r="1.3" fill="currentColor" stroke="none"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M3.5 16.5l4.5-4.5 4 3.5 3.5-3 5 4.5"/>'
+  };
+
+  var shell = document.getElementById('shell');
+  var sidebarToggle = document.getElementById('sidebar-toggle');
+  var sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  var sideTools = document.getElementById('side-tools');
+  var tbarLabel = document.getElementById('tbar-label');
+  var detailIcon = document.getElementById('detail-icon');
+  var detailName = document.getElementById('detail-name');
+  var detailDesc = document.getElementById('detail-desc');
+  var detailFile = document.getElementById('detail-file');
+  var metaTheme = document.getElementById('meta-theme');
+  var themeBtn = document.getElementById('theme-toggle');
+
+  var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
+  var me = '';
+  try { me = decodeURIComponent(location.pathname.split('/').pop() || ''); } catch (e) {}
+
+  function iconSvg(inner, w) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+  }
+
+  /* ---------- 侧栏工具列表 + 当前页高亮 ---------- */
+  var current = null;
+  if (list.length) {
+    list.forEach(function (t) {
+      var fileName = (t.file || '').split('/').pop();
+      var a = document.createElement('a');
+      a.className = 'side-item' + (fileName === me ? ' is-active' : '');
+      a.href = t.file;
+      if (fileName === me) {
+        a.setAttribute('aria-current', 'page');
+        current = t;
+      }
+      a.innerHTML =
+        '<span class="side-dot" style="background-color:' + (t.accent || '#0071e3') + '"></span>' +
+        '<span style="overflow:hidden;text-overflow:ellipsis">' + t.name + '</span>';
+      sideTools.appendChild(a);
+    });
+    sideTools.hidden = false;
+  }
+
+  /* ---------- 页头：注册表命中则填充，未命中保留占位文案 ---------- */
+  if (current) {
+    tbarLabel.textContent = current.name;
+    detailName.textContent = current.name;
+    detailDesc.textContent = current.desc;
+    detailFile.textContent = current.file;
+    detailIcon.style.backgroundColor = current.accent || '#0071e3';
+    detailIcon.innerHTML = iconSvg(ICONS[current.icon] || ICONS.plus);
+    document.title = current.name + ' · htools';
+  }
+
+  /* ---------- 侧栏：跟随 1440 自动开合，手动一次后交给用户 ---------- */
+  var mqWide = window.matchMedia('(min-width: 90rem)');
+  var userTookOver = false;
+
+  function setSidebar(open) {
+    shell.setAttribute('data-sidebar', open ? 'open' : 'closed');
+    sidebarToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    sidebarToggle.setAttribute('aria-label', open ? '收起侧栏' : '展开侧栏');
+  }
+  function syncSidebar() {
+    if (!userTookOver) setSidebar(mqWide.matches);
+  }
+  sidebarToggle.addEventListener('click', function () {
+    userTookOver = true;
+    setSidebar(shell.getAttribute('data-sidebar') !== 'open');
+  });
+  sidebarBackdrop.addEventListener('click', function () {
+    userTookOver = true;
+    setSidebar(false);
+  });
+  if (typeof mqWide.addEventListener === 'function') {
+    mqWide.addEventListener('change', syncSidebar);
+  }
+  syncSidebar();
+
+  /* ---------- 深浅色：默认跟随系统，手动选择后记住并停止跟随 ---------- */
+  var mqDark = window.matchMedia('(prefers-color-scheme: dark)');
+  function storedTheme() {
+    try { return localStorage.getItem('htools:theme'); } catch (e) { return null; }
+  }
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+  function applyTheme(t, persist) {
+    document.documentElement.setAttribute('data-theme', t);
+    if (metaTheme) metaTheme.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#fbfbfc');
+    if (persist) {
+      try { localStorage.setItem('htools:theme', t); } catch (e) {}
+    }
+  }
+  applyTheme(currentTheme(), false);
+  themeBtn.addEventListener('click', function () {
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+  });
+  if (typeof mqDark.addEventListener === 'function') {
+    mqDark.addEventListener('change', function (e) {
+      if (!storedTheme()) applyTheme(e.matches ? 'dark' : 'light', false);
+    });
+  }
+})();
+</script>
+</body>
+</html>
