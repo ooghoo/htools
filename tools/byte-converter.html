@@ -522,10 +522,9 @@
     color: var(--muted-foreground);
   }
 
-  /* ---------- 全屏版（#bare）：去掉站点外壳，只留工具 ---------- */
+  /* ---------- 全屏版（#bare）：独立站点 —— 只留页头栏与工具，去掉顶栏与侧栏 ---------- */
   html.is-bare .topbar,
   html.is-bare .sidebar,
-  html.is-bare .detail-bar,
   html.is-bare .sidebar-backdrop,
   html.is-bare .content-mask { display: none; }
   html.is-bare .shell { background: var(--background); }
@@ -536,6 +535,7 @@
     box-shadow: none;
     background: var(--background);
   }
+  html.is-bare .detail-bar { background: var(--background); }
 
   /* ---------- 窄屏：顶栏精简 ---------- */
   @media (max-width: 640px) {
