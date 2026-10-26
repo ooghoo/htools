@@ -11,20 +11,24 @@
   ============================================================
   htools 工具详情页模版（CloudAI 控制台风格）
   ------------------------------------------------------------
+  页面框架（勿改）：
+    顶栏        ← 返回 / 侧栏开关 / 品牌 / GitHub / 深浅色
+    页头栏      图标 + 标题 + 描述（左）｜文件路径 + 全屏打开（右），不随滚动动
+    内容区      自定义，放在 .tool-body 里，滚动只发生在这一区
+
   新工具三步走：
   1. 复制本文件为 tools/your-tool.html
-  2. 替换 <div class="tool-body"> 里的内容为你的工具 UI
+  2. 把 <div class="tool-body"> 里的内容换成你的工具 UI
      （可用下面的共享组件：ca-card / ca-input / ca-select /
       ca-seg / ca-btn / ca-row / ca-note / ca-empty …）
   3. 在根目录 tools.js 的 TOOLS 数组注册一条
-     （页头图标、名称、描述、侧栏高亮会自动从注册表读取）
+     （页头栏的图标 / 标题 / 描述、侧栏高亮会自动从注册表读取）
 
   约定：
   - 样式只用共享 token 与 ca-* 组件，不引外部 CDN，保证离线可用
   - 需要局部别名时用 --t- 前缀（如 --t-xxx: var(--muted)），
      不要重定义 token 名（--card / --accent 等），会撞车
-  - 顶栏「←」与侧栏「返回首页」已内置，不用自己写返回链接
-  - 深浅色自动跟随系统 / 用户在首页的选择，无需处理
+  - 深浅色、返回首页、侧栏导航、页头栏模版已内置，不用自己处理
   ============================================================
 -->
 <script>
@@ -80,6 +84,9 @@
     --sidebar-accent: hsl(240 18.18% 95.69%);
     --sidebar-accent-foreground: hsl(240 13.95% 16.86%);
 
+    /* 页面级私有 token（--t- 前缀） */
+    --t-scrollbar: hsl(240 1.1% 64.31% / .42);
+
     --radius: 8px;
     --radius-card: 12px;
     --radius-panel: 20px;
@@ -118,11 +125,14 @@
     --sidebar-foreground: hsl(264 100% 99.02%);
     --sidebar-accent: hsl(0 0% 14.9%);
     --sidebar-accent-foreground: hsl(0 0% 98.04%);
+
+    --t-scrollbar: hsl(240 0.83% 52.55% / .5);
   }
 
   /* ================= 基础 ================= */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
+  [hidden] { display: none !important; }
   body {
     font-family: var(--font);
     font-size: 14px;
@@ -139,7 +149,7 @@
   ::selection { background: hsl(235.65 84.93% 71.37% / .28); }
 
   /* ============================================================
-     AppShell：整页不滚，滚动只发生在 ContentArea 内部
+     AppShell：整页不滚，滚动只发生在内容区内部
      ============================================================ */
   .shell {
     display: flex;
@@ -201,7 +211,6 @@
   .tbar-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
   .tbar-label { font-size: 13px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* 深浅色切换：日月图标交叉淡入淡出 */
   .theme-btn { position: relative; }
   .theme-btn .i {
     position: absolute;
@@ -236,9 +245,19 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--t-scrollbar) transparent;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 8px; }
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--t-scrollbar);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
   .side-group { display: flex; flex-direction: column; gap: 2px; }
   .side-label { font-size: 12px; color: var(--muted-foreground); padding: 4px 8px; }
@@ -258,15 +277,14 @@
   .side-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--secondary-foreground); }
   .side-item:hover { background: var(--sidebar-accent); }
   .side-item.is-active { background: var(--brand-1); color: var(--sidebar-accent-foreground); font-weight: 500; }
-  .side-item .ext { width: 12px; height: 12px; margin-left: auto; opacity: .55; flex-shrink: 0; }
   .side-item .side-dot {
     width: 6px; height: 6px; border-radius: 999px;
-    background: var(--t-accent, var(--brand)); /* 工具图标同色小圆点，JS 注入 */
+    background: var(--brand);
     flex-shrink: 0;
   }
   .side-foot { flex-shrink: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted-foreground); padding: 0 8px; }
 
-  /* ---------- ContentArea：唯一主滚动容器 ---------- */
+  /* ---------- ContentArea ---------- */
   .content {
     position: relative;
     flex: 1;
@@ -279,34 +297,22 @@
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     overflow: hidden;
   }
-  .content-scroll { flex: 1; min-height: 0; overflow-y: auto; }
-  .content-mask {
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 88px;
-    background: linear-gradient(to bottom, transparent, var(--background));
-    pointer-events: none;
-  }
 
-  /* ============================================================
-     PageContent：工具详情
-     ============================================================ */
-  .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
-
-  /* ---------- 页头：图标 + 名称 + 描述 + 文件路径 ---------- */
-  .detail-head {
+  /* ---------- 页头栏：图标 + 标题 + 描述｜文件路径 + 全屏打开，不随滚动动 ---------- */
+  .detail-bar {
+    flex-shrink: 0;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
   }
-  .detail-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .detail-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
   .detail-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: grid;
     place-items: center;
     color: #fff;
@@ -314,10 +320,10 @@
     background-image: linear-gradient(150deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 62%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
   }
-  .detail-icon svg { width: 22px; height: 22px; }
-  .detail-id h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; }
-  .detail-desc { margin-top: 2px; font-size: 13px; color: var(--muted-foreground); }
-  .detail-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .detail-icon svg { width: 18px; height: 18px; }
+  .detail-id h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .detail-desc { margin-top: 1px; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .detail-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
   .detail-file {
     font-family: var(--mono);
     font-size: 11.5px;
@@ -326,7 +332,39 @@
     border-radius: 6px;
     padding: 4px 9px;
     white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  @media (max-width: 720px) { .detail-file { display: none; } }
+  @media (max-width: 480px) { .detail-desc { display: none; } }
+
+  /* ---------- 内容滚动区：唯一滚动容器 ---------- */
+  .content-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable; /* 滚动条常驻 gutter，出现/消失都不挤内容 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--t-scrollbar) transparent;
+  }
+  .content-scroll::-webkit-scrollbar { width: 8px; }
+  .content-scroll::-webkit-scrollbar-thumb {
+    background: var(--t-scrollbar);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  .content-scroll::-webkit-scrollbar-track { background: transparent; }
+  .content-mask {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 88px;
+    background: linear-gradient(to bottom, transparent, var(--background));
+    pointer-events: none;
+  }
+
+  .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
 
   /* ---------- 工具内容区（把工具的 UI 放在这里） ---------- */
   .tool-body { display: flex; flex-direction: column; gap: 16px; }
@@ -634,24 +672,28 @@
 
       <!-- ContentArea -->
       <main class="content">
+        <!-- 页头栏：注册表命中时由 JS 填充，未命中时用占位文案；不随滚动动 -->
+        <div class="detail-bar">
+          <div class="detail-id">
+            <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <div style="min-width:0">
+              <h1 id="detail-name">工具名称</h1>
+              <p class="detail-desc" id="detail-desc">一句话描述这个工具做什么。</p>
+            </div>
+          </div>
+          <div class="detail-meta">
+            <span class="detail-file" id="detail-file">tools/your-tool.html</span>
+            <button class="tbtn" id="fs-btn" aria-label="全屏打开" title="全屏打开（再次点击退出）">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 内容区：自定义，滚动只发生在这一区 -->
         <div class="content-scroll">
           <div class="page">
-            <!-- 页头：注册表命中时由 JS 填充，未命中时用下面的占位文案 -->
-            <div class="detail-head">
-              <div class="detail-id">
-                <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                </span>
-                <div>
-                  <h1 id="detail-name">工具名称</h1>
-                  <p class="detail-desc" id="detail-desc">一句话描述这个工具做什么。</p>
-                </div>
-              </div>
-              <div class="detail-meta">
-                <span class="detail-file" id="detail-file">tools/your-tool.html</span>
-              </div>
-            </div>
-
             <!-- ========== 工具内容区：替换成你的工具 UI ========== -->
             <div class="tool-body">
               <div class="ca-card">
@@ -745,6 +787,7 @@
   var detailFile = document.getElementById('detail-file');
   var metaTheme = document.getElementById('meta-theme');
   var themeBtn = document.getElementById('theme-toggle');
+  var fsBtn = document.getElementById('fs-btn');
 
   var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
   var me = '';
@@ -774,7 +817,7 @@
     sideTools.hidden = false;
   }
 
-  /* ---------- 页头：注册表命中则填充，未命中保留占位文案 ---------- */
+  /* ---------- 页头栏：注册表命中则填充，未命中保留占位文案 ---------- */
   if (current) {
     tbarLabel.textContent = current.name;
     detailName.textContent = current.name;
@@ -784,6 +827,25 @@
     detailIcon.innerHTML = iconSvg(ICONS[current.icon] || ICONS.plus);
     document.title = current.name + ' · htools';
   }
+
+  /* ---------- 全屏打开（不支持时降级为新标签页） ---------- */
+  fsBtn.addEventListener('click', function () {
+    var el = document.documentElement;
+    var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl) {
+      (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
+      return;
+    }
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) {
+      var p = req.call(el);
+      if (p && typeof p.catch === 'function') {
+        p.catch(function () { window.open(location.href, '_blank', 'noopener'); });
+      }
+    } else {
+      window.open(location.href, '_blank', 'noopener');
+    }
+  });
 
   /* ---------- 侧栏：跟随 1440 自动开合，手动一次后交给用户 ---------- */
   var mqWide = window.matchMedia('(min-width: 90rem)');

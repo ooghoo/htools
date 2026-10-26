@@ -59,6 +59,9 @@
     --sidebar-accent: hsl(240 18.18% 95.69%);
     --sidebar-accent-foreground: hsl(240 13.95% 16.86%);
 
+    /* 页面级私有 token（--t- 前缀，避免与设计 token 撞名） */
+    --t-scrollbar: hsl(240 1.1% 64.31% / .42); /* 细滚动条 */
+
     --radius: 8px;
     --radius-card: 12px;
     --radius-panel: 20px;
@@ -97,6 +100,8 @@
     --sidebar-foreground: hsl(264 100% 99.02%);
     --sidebar-accent: hsl(0 0% 14.9%);
     --sidebar-accent-foreground: hsl(0 0% 98.04%);
+
+    --t-scrollbar: hsl(240 0.83% 52.55% / .5);
   }
 
   /* ================= 基础 ================= */
@@ -211,9 +216,19 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--t-scrollbar) transparent;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 8px; }
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--t-scrollbar);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
   .side-group { display: flex; flex-direction: column; gap: 2px; }
   .side-label { font-size: 12px; color: var(--muted-foreground); padding: 4px 8px; }
@@ -252,7 +267,21 @@
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     overflow: hidden;
   }
-  .content-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+  .content-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable; /* 滚动条常驻 gutter，出现/消失都不挤内容 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--t-scrollbar) transparent;
+  }
+  .content-scroll::-webkit-scrollbar { width: 8px; }
+  .content-scroll::-webkit-scrollbar-thumb {
+    background: var(--t-scrollbar);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
   .content-mask {
     position: absolute;
     inset: auto 0 0 0;
@@ -263,20 +292,21 @@
 
   .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
 
-  /* ---------- 页头 ---------- */
-  .detail-head {
+  /* ---------- 页头栏：图标 + 标题 + 描述｜文件路径 + 全屏打开，不随滚动动 ---------- */
+  .detail-bar {
+    flex-shrink: 0;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
   }
-  .detail-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .detail-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
   .detail-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: grid;
     place-items: center;
     color: #fff;
@@ -284,10 +314,10 @@
     background-image: linear-gradient(150deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 62%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
   }
-  .detail-icon svg { width: 22px; height: 22px; }
-  .detail-id h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; }
-  .detail-desc { margin-top: 2px; font-size: 13px; color: var(--muted-foreground); }
-  .detail-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .detail-icon svg { width: 18px; height: 18px; }
+  .detail-id h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .detail-desc { margin-top: 1px; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .detail-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
   .detail-file {
     font-family: var(--mono);
     font-size: 11.5px;
@@ -296,7 +326,12 @@
     border-radius: 6px;
     padding: 4px 9px;
     white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  @media (max-width: 720px) { .detail-file { display: none; } }
+  @media (max-width: 480px) { .detail-desc { display: none; } }
 
   .tool-body { display: flex; flex-direction: column; gap: 16px; }
 
@@ -588,24 +623,28 @@
       </aside>
 
       <main class="content">
+        <!-- 页头栏：注册表命中时由 JS 填充；不随滚动动 -->
+        <div class="detail-bar">
+          <div class="detail-id">
+            <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/><path d="M4.5 11.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/></svg>
+            </span>
+            <div style="min-width:0">
+              <h1 id="detail-name">字节换算</h1>
+              <p class="detail-desc" id="detail-desc">bit / B / KB … YB 实时互转，1024 与 1000 两种进制</p>
+            </div>
+          </div>
+          <div class="detail-meta">
+            <span class="detail-file" id="detail-file">tools/byte-converter.html</span>
+            <button class="tbtn" id="fs-btn" aria-label="全屏打开" title="全屏打开（再次点击退出）">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 内容区：滚动只发生在这一区 -->
         <div class="content-scroll">
           <div class="page">
-            <!-- 页头：注册表命中时由 JS 填充 -->
-            <div class="detail-head">
-              <div class="detail-id">
-                <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/><path d="M4.5 11.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/></svg>
-                </span>
-                <div>
-                  <h1 id="detail-name">字节换算</h1>
-                  <p class="detail-desc" id="detail-desc">bit / B / KB … YB 实时互转，1024 与 1000 两种进制</p>
-                </div>
-              </div>
-              <div class="detail-meta">
-                <span class="detail-file" id="detail-file">tools/byte-converter.html</span>
-              </div>
-            </div>
-
             <!-- ========== 工具内容 ========== -->
             <div class="tool-body">
               <div class="card">
@@ -669,6 +708,7 @@
   var detailFile = document.getElementById('detail-file');
   var metaTheme = document.getElementById('meta-theme');
   var themeBtn = document.getElementById('theme-toggle');
+  var fsBtn = document.getElementById('fs-btn');
 
   var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
   var me = '';
@@ -706,6 +746,25 @@
     detailIcon.innerHTML = iconSvg(ICONS[current.icon] || ICONS.plus);
     document.title = current.name + ' · htools';
   }
+
+  /* ---------- 全屏打开（不支持时降级为新标签页） ---------- */
+  fsBtn.addEventListener('click', function () {
+    var el = document.documentElement;
+    var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl) {
+      (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
+      return;
+    }
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) {
+      var p = req.call(el);
+      if (p && typeof p.catch === 'function') {
+        p.catch(function () { window.open(location.href, '_blank', 'noopener'); });
+      }
+    } else {
+      window.open(location.href, '_blank', 'noopener');
+    }
+  });
 
   var mqWide = window.matchMedia('(min-width: 90rem)');
   var userTookOver = false;
