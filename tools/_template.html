@@ -568,6 +568,21 @@
   .ca-empty-title { font-size: 14px; font-weight: 600; }
   .ca-empty-desc { margin-top: 4px; font-size: 12.5px; color: var(--muted-foreground); }
 
+  /* ---------- 全屏版（#bare）：去掉站点外壳，只留工具 ---------- */
+  html.is-bare .topbar,
+  html.is-bare .sidebar,
+  html.is-bare .detail-bar,
+  html.is-bare .sidebar-backdrop,
+  html.is-bare .content-mask { display: none; }
+  html.is-bare .shell { background: var(--background); }
+  html.is-bare .main-row { padding: 0; gap: 0; }
+  html.is-bare .content {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--background);
+  }
+
   /* ---------- 窄屏：顶栏精简 ---------- */
   @media (max-width: 640px) {
     .tbar-sep, .tbar-label { display: none; }
@@ -685,8 +700,8 @@
           </div>
           <div class="detail-meta">
             <span class="detail-file" id="detail-file">tools/your-tool.html</span>
-            <button class="tbtn" id="fs-btn" aria-label="全屏打开" title="全屏打开（再次点击退出）">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            <button class="tbtn" id="fs-btn" aria-label="在新标签页打开全屏页面" title="在新标签页打开全屏页面（无顶栏与侧栏）">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
             </button>
           </div>
         </div>
@@ -828,23 +843,13 @@
     document.title = current.name + ' · htools';
   }
 
-  /* ---------- 全屏打开（不支持时降级为新标签页） ---------- */
+  /* ---------- 全屏版：在新标签页打开（#bare 隐藏顶栏与侧栏） ---------- */
+  if (location.hash.indexOf('bare') !== -1) {
+    document.documentElement.classList.add('is-bare');
+  }
   fsBtn.addEventListener('click', function () {
-    var el = document.documentElement;
-    var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-    if (fsEl) {
-      (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
-      return;
-    }
-    var req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (req) {
-      var p = req.call(el);
-      if (p && typeof p.catch === 'function') {
-        p.catch(function () { window.open(location.href, '_blank', 'noopener'); });
-      }
-    } else {
-      window.open(location.href, '_blank', 'noopener');
-    }
+    var base = location.href.split('#')[0];
+    window.open(base + '#bare', '_blank', 'noopener');
   });
 
   /* ---------- 侧栏：跟随 1440 自动开合，手动一次后交给用户 ---------- */
