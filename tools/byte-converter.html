@@ -292,7 +292,7 @@
 
   .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
 
-  /* ---------- 页头栏：图标 + 标题 + 描述｜文件路径 + 全屏打开，不随滚动动 ---------- */
+  /* ---------- 页头栏：标题 + 描述，由注册表填充，不随滚动动 ---------- */
   .detail-bar {
     flex-shrink: 0;
     display: flex;
@@ -302,35 +302,8 @@
     border-bottom: 1px solid var(--border);
     background: var(--background);
   }
-  .detail-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .detail-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    color: #fff;
-    flex-shrink: 0;
-    background-image: linear-gradient(150deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 62%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
-  }
-  .detail-icon svg { width: 18px; height: 18px; }
-  .detail-id h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .detail-desc { margin-top: 1px; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .detail-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
-  .detail-file {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--muted-foreground);
-    background: var(--muted);
-    border-radius: 6px;
-    padding: 4px 9px;
-    white-space: nowrap;
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  @media (max-width: 720px) { .detail-file { display: none; } }
+  .detail-bar h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; white-space: nowrap; }
+  .detail-desc { font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   @media (max-width: 480px) { .detail-desc { display: none; } }
 
   .tool-body { display: flex; flex-direction: column; gap: 16px; }
@@ -522,24 +495,6 @@
     color: var(--muted-foreground);
   }
 
-  /* ---------- 全屏版（#bare）：工具铺满整个浏览器窗口（独立应用，无任何站点框架） ---------- */
-  html.is-bare .topbar,
-  html.is-bare .sidebar,
-  html.is-bare .detail-bar,
-  html.is-bare .sidebar-backdrop,
-  html.is-bare .content-mask { display: none; }
-  html.is-bare .shell { background: var(--background); }
-  html.is-bare .main-row { padding: 0; gap: 0; }
-  html.is-bare .content {
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    background: var(--background);
-  }
-  /* 内容不满一屏时垂直居中，超出时从顶部开始滚动 */
-  html.is-bare .content-scroll { display: flex; flex-direction: column; }
-  html.is-bare .page { margin: auto; width: 100%; padding: 24px; }
-
   /* ---------- 窄屏：顶栏精简 ---------- */
   @media (max-width: 640px) {
     .tbar-sep, .tbar-label { display: none; }
@@ -586,9 +541,6 @@
     <!-- ================= TopBar ================= -->
     <header class="topbar">
       <div class="topbar-left">
-        <a class="tbtn" href="../index.html" aria-label="返回首页">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        </a>
         <button class="tbtn" id="sidebar-toggle" aria-label="展开侧栏" aria-expanded="false" aria-controls="sidebar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
         </button>
@@ -624,10 +576,6 @@
         <nav class="sidebar-nav">
           <div class="side-group">
             <p class="side-label">导航</p>
-            <a class="side-item" href="../index.html">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              返回首页
-            </a>
             <a class="side-item" href="../index.html#tools">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               全部工具
@@ -643,20 +591,9 @@
       <main class="content">
         <!-- 页头栏：注册表命中时由 JS 填充；不随滚动动 -->
         <div class="detail-bar">
-          <div class="detail-id">
-            <span class="detail-icon" id="detail-icon" style="background-color:#0071e3" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/><path d="M4.5 11.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/></svg>
-            </span>
-            <div style="min-width:0">
-              <h1 id="detail-name">字节换算</h1>
-              <p class="detail-desc" id="detail-desc">bit / B / KB … YB 实时互转，1024 与 1000 两种进制</p>
-            </div>
-          </div>
-          <div class="detail-meta">
-            <span class="detail-file" id="detail-file">tools/byte-converter.html</span>
-            <button class="tbtn" id="fs-btn" aria-label="在新标签页打开全屏页面" title="在新标签页打开全屏页面（无顶栏与侧栏）">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-            </button>
+          <div style="min-width:0">
+            <h1 id="detail-name">字节换算</h1>
+            <p class="detail-desc" id="detail-desc">bit / B / KB … YB 实时互转，1024 与 1000 两种进制</p>
           </div>
         </div>
 
@@ -720,21 +657,14 @@
   var sidebarBackdrop = document.getElementById('sidebar-backdrop');
   var sideTools = document.getElementById('side-tools');
   var tbarLabel = document.getElementById('tbar-label');
-  var detailIcon = document.getElementById('detail-icon');
   var detailName = document.getElementById('detail-name');
   var detailDesc = document.getElementById('detail-desc');
-  var detailFile = document.getElementById('detail-file');
   var metaTheme = document.getElementById('meta-theme');
   var themeBtn = document.getElementById('theme-toggle');
-  var fsBtn = document.getElementById('fs-btn');
 
   var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
   var me = '';
   try { me = decodeURIComponent(location.pathname.split('/').pop() || ''); } catch (e) {}
-
-  function iconSvg(inner, w) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
-  }
 
   var current = null;
   if (list.length) {
@@ -759,20 +689,8 @@
     tbarLabel.textContent = current.name;
     detailName.textContent = current.name;
     detailDesc.textContent = current.desc;
-    detailFile.textContent = current.file;
-    detailIcon.style.backgroundColor = current.accent || '#0071e3';
-    detailIcon.innerHTML = iconSvg(ICONS[current.icon] || ICONS.plus);
     document.title = current.name + ' · htools';
   }
-
-  /* ---------- 全屏版：在新标签页打开（#bare 隐藏顶栏与侧栏） ---------- */
-  if (location.hash.indexOf('bare') !== -1) {
-    document.documentElement.classList.add('is-bare');
-  }
-  fsBtn.addEventListener('click', function () {
-    var base = location.href.split('#')[0];
-    window.open(base + '#bare', '_blank', 'noopener');
-  });
 
   var mqWide = window.matchMedia('(min-width: 90rem)');
   var userTookOver = false;
