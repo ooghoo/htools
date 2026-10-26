@@ -568,9 +568,10 @@
   .ca-empty-title { font-size: 14px; font-weight: 600; }
   .ca-empty-desc { margin-top: 4px; font-size: 12.5px; color: var(--muted-foreground); }
 
-  /* ---------- 全屏版（#bare）：独立站点 —— 只留页头栏与工具，去掉顶栏与侧栏 ---------- */
+  /* ---------- 全屏版（#bare）：工具铺满整个浏览器窗口（独立应用，无任何站点框架） ---------- */
   html.is-bare .topbar,
   html.is-bare .sidebar,
+  html.is-bare .detail-bar,
   html.is-bare .sidebar-backdrop,
   html.is-bare .content-mask { display: none; }
   html.is-bare .shell { background: var(--background); }
@@ -581,7 +582,9 @@
     box-shadow: none;
     background: var(--background);
   }
-  html.is-bare .detail-bar { background: var(--background); }
+  /* 内容不满一屏时垂直居中，超出时从顶部开始滚动 */
+  html.is-bare .content-scroll { display: flex; flex-direction: column; }
+  html.is-bare .page { margin: auto; width: 100%; padding: 24px; }
 
   /* ---------- 窄屏：顶栏精简 ---------- */
   @media (max-width: 640px) {
