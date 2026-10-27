@@ -47,6 +47,21 @@
   scrollbar-gutter: stable;
 }
 
+/* 工具页头部插槽：位于滚动区之上，始终固定，与下方内容不在同一滚动层 */
+.tool-head-slot {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+
+.tool-head-slot:has(> *) {
+  background: var(--background-95);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
 .page {
   display: flex;
   flex-direction: column;

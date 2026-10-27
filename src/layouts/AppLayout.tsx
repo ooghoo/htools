@@ -76,6 +76,7 @@ export function AppLayout() {
         )}
 
         <main className={s.content} id="main-content">
+          <div id="tool-head-slot" className={s['tool-head-slot']} />
           <div ref={scrollRef} className={cx(s.scroll, 'scroll-thin')}>
             <div className={s.page}>
               <Outlet />

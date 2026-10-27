@@ -1,16 +1,12 @@
 .head {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-width: 0;
-  padding-bottom: var(--space-3);
-  background: var(--background-95);
-  -webkit-backdrop-filter: saturate(180%) blur(16px);
-  backdrop-filter: saturate(180%) blur(16px);
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-4) 24px;
 }
 
 .back {
@@ -146,6 +142,10 @@
 }
 
 @media (max-width: 640px) {
+  .head {
+    padding: var(--space-3) var(--space-4);
+  }
+
   .title {
     font-size: var(--text-xl);
   }
