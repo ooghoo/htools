@@ -24,7 +24,7 @@
     } catch (e) {}
   })();
 </script>
-<style data-page-style>
+<style>
   /* ============================================================
      设计 token：CloudAI aidbs 主题（Light / Dark 实际取值）
      ============================================================ */
@@ -232,7 +232,15 @@
     background-clip: content-box;
   }
   .side-group { display: flex; flex-direction: column; gap: 2px; }
-  .side-label { font-size: 12px; color: var(--muted-foreground); padding: 4px 8px; }
+  .side-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+  }
+  .side-label svg { width: 11px; height: 11px; }
   .side-item {
     display: flex;
     align-items: center;
@@ -253,6 +261,54 @@
     width: 6px; height: 6px; border-radius: 999px;
     background: var(--brand);
     flex-shrink: 0;
+  }
+  /* 收藏项：链接 + 取消按钮（分开，避免按钮嵌在链接里） */
+  .side-fav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+  }
+  .side-fav-link > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+  .side-tool-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .side-tool-icon svg { width: 12px; height: 12px; color: #fff; }
+  .side-remove {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    opacity: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity .15s, background-color .15s, color .15s;
+  }
+  .side-remove svg { width: 11px; height: 11px; }
+  .side-item:hover .side-remove { opacity: 1; }
+  .side-remove:hover { background: var(--muted); color: var(--foreground); }
+  .side-remove:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
+  @media (hover: none) { .side-remove { opacity: 1; } }
+  .side-empty {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+    padding: 2px 8px 6px;
   }
   .side-foot { flex-shrink: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted-foreground); padding: 0 8px; }
 
@@ -682,7 +738,7 @@
           <span class="brand-name">htools</span>
         </a>
         <span class="tbar-sep" aria-hidden="true"></span>
-        <span class="tbar-label" id="tbar-label" data-region="tbar-label">图片水印</span>
+        <span class="tbar-label" id="tbar-label">图片水印</span>
       </div>
       <div class="topbar-actions">
         <a class="tbtn" href="https://github.com/ooghoo/htools" target="_blank" rel="noopener" aria-label="GitHub 仓库">
@@ -707,18 +763,19 @@
         <nav class="sidebar-nav">
           <div class="side-group">
             <p class="side-label">导航</p>
-            <a class="side-item" href="../index.html#tools" data-nav="">
+            <a class="side-item" href="../index.html#tools">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               全部工具
             </a>
           </div>
+          <!-- 收藏：快捷访问收藏的工具（localStorage 持久化） -->
           <div class="side-group" id="side-favs">
             <p class="side-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
               收藏
             </p>
             <div id="fav-list"></div>
-            <p class="side-empty" id="fav-empty">还没有收藏 —— 点首页卡片右上角的心形图标，就能收藏到这里。</p>
+            <p class="side-empty" id="fav-empty">还没有收藏的工具。</p>
           </div>
           <div class="side-group" id="side-tools" hidden>
             <p class="side-label">工具</p>
@@ -729,15 +786,15 @@
 
       <main class="content">
         <!-- 页头栏：注册表命中时由 JS 填充；不随滚动动 -->
-        <div class="detail-bar" data-region="detail-bar">
+        <div class="detail-bar">
           <div style="min-width:0">
-            <h1 id="detail-name" data-region="detail-name">图片水印</h1>
-            <p class="detail-desc" id="detail-desc" data-region="detail-desc">批量加水印，样式统一，导出按像素缩放</p>
+            <h1 id="detail-name">图片水印</h1>
+            <p class="detail-desc" id="detail-desc">批量加水印，样式统一，导出按像素缩放</p>
           </div>
         </div>
 
         <!-- 内容区：画布类工具，不滚动，由工具管理内部布局 -->
-        <div class="content-scroll" data-region="content">
+        <div class="content-scroll">
           <div class="page page--fill">
             <!-- ========== 工具内容 ========== -->
             <div class="tool-body">
@@ -995,9 +1052,9 @@
 </div>
 
 <script src="../tools.js"></script>
-<script data-shell>
+<script>
 /* ============================================================
-   外壳脚本：侧栏 / 深浅色 / 注册表路由 —— 全站共用，换页时不重复执行
+   外壳脚本（与 _template.html 一致）：侧栏注册表 / 页头栏填充 / 主题
    ============================================================ */
 (function () {
   'use strict';
@@ -1008,11 +1065,24 @@
   var sideTools = document.getElementById('side-tools');
   var favList = document.getElementById('fav-list');
   var favEmpty = document.getElementById('fav-empty');
-  var tbarLabel = document.querySelector('[data-region="tbar-label"]');
-  var contentScroll = document.querySelector('[data-region="content"]');
+  var tbarLabel = document.getElementById('tbar-label');
+  var detailName = document.getElementById('detail-name');
+  var detailDesc = document.getElementById('detail-desc');
   var metaTheme = document.getElementById('meta-theme');
   var themeBtn = document.getElementById('theme-toggle');
 
+  var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
+  var me = '';
+  try { me = decodeURIComponent(location.pathname.split('/').pop() || ''); } catch (e) {}
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function iconSvg(inner, w) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+  }
+
+  /* ---------- 工具图标库（与首页保持一致） ---------- */
   var ICONS = {
     byte: '<ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/><path d="M4.5 11.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
@@ -1023,46 +1093,33 @@
     image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M3.5 16.5l4.5-4.5 4 3.5 3.5-3 5 4.5"/>'
   };
 
-  var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
-  var toolItems = []; /* { a, tool } */
-  window.htoolsIcons = ICONS; /* 页面脚本生成卡片图标用 */
-
-  function iconSvg(inner, w) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
-  }
-  function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  function fileName(url) {
-    return (url || '').split('#')[0].split('?')[0].split('/').pop() || '';
-  }
-  function isHomeUrl(url) {
-    var f = fileName(url);
-    return f === 'index.html' || f === '';
-  }
-  function findTool(file) {
-    for (var i = 0; i < list.length; i++) {
-      if ((list[i].file || '').split('/').pop() === file) return list[i];
-    }
-    return null;
-  }
-
-  /* ---------- 侧栏工具列表（注册表） ---------- */
+  var current = null;
   if (list.length) {
     list.forEach(function (t) {
+      var fileName = (t.file || '').split('/').pop();
       var a = document.createElement('a');
-      a.className = 'side-item';
-      a.setAttribute('data-nav', '');
+      a.className = 'side-item' + (fileName === me ? ' is-active' : '');
+      a.href = t.file;
+      if (fileName === me) {
+        a.setAttribute('aria-current', 'page');
+        current = t;
+      }
       a.innerHTML =
         '<span class="side-dot" style="background-color:' + (t.accent || '#0071e3') + '"></span>' +
-        '<span style="overflow:hidden;text-overflow:ellipsis">' + esc(t.name) + '</span>';
+        '<span style="overflow:hidden;text-overflow:ellipsis">' + t.name + '</span>';
       sideTools.appendChild(a);
-      toolItems.push({ a: a, tool: t });
     });
     sideTools.hidden = false;
   }
 
-  /* ---------- 收藏（localStorage 持久化，侧栏快捷访问） ---------- */
+  if (current) {
+    tbarLabel.textContent = current.name;
+    detailName.textContent = current.name;
+    detailDesc.textContent = current.desc;
+    document.title = current.name + ' · htools';
+  }
+
+  /* ---------- 侧栏收藏栏（与首页一致，localStorage 持久化） ---------- */
   var FAV_KEY = 'htools:favs';
   var favs = new Set();
   try {
@@ -1074,17 +1131,16 @@
     try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs))); } catch (e) {}
   }
   function renderFavGroup() {
-    if (!favList) return;
     favList.innerHTML = '';
     var favTools = list.filter(function (t) { return favs.has(favId(t)); });
-    if (favEmpty) favEmpty.hidden = favTools.length > 0;
+    favEmpty.hidden = favTools.length > 0;
     favTools.forEach(function (t) {
       var row = document.createElement('div');
       row.className = 'side-item';
 
       var link = document.createElement('a');
       link.className = 'side-fav-link';
-      link.setAttribute('data-nav', '');
+      link.href = t.file;
       link.innerHTML =
         '<span class="side-tool-icon" style="background-color:' + (t.accent || '#0071e3') + '" aria-hidden="true">' +
           iconSvg(ICONS[t.icon] || ICONS.plus, 2) +
@@ -1096,79 +1152,19 @@
       remove.className = 'side-remove';
       remove.setAttribute('aria-label', '取消收藏 ' + t.name);
       remove.innerHTML = iconSvg('<path d="M18 6L6 18M6 6l12 12"/>', 2.4);
-      remove.addEventListener('click', function () { toggleFav(t); });
+      remove.addEventListener('click', function () {
+        favs.delete(favId(t));
+        saveFavs();
+        renderFavGroup();
+      });
 
       row.appendChild(link);
       row.appendChild(remove);
       favList.appendChild(row);
     });
   }
-  function toggleFav(t) {
-    var id = favId(t);
-    if (favs.has(id)) favs.delete(id); else favs.add(id);
-    saveFavs();
-    renderFavGroup();
-    if (typeof window.htoolsOnFavsChange === 'function') window.htoolsOnFavsChange();
-  }
-  window.htoolsIsFav = function (t) { return favs.has(favId(t)); };
-  window.htoolsToggleFav = toggleFav;
-  window.htoolsSyncFavs = renderFavGroup;
+  renderFavGroup();
 
-  /* ---------- 路由同步：侧栏高亮 / 标签 / 页头栏 / 标题 ---------- */
-  function syncRoute(url) {
-    var isHome = isHomeUrl(url);
-    var file = fileName(url) || 'index.html';
-    var t = findTool(file);
-
-    Array.prototype.forEach.call(document.querySelectorAll('#sidebar .side-item'), function (a) {
-      var f2 = fileName(a.getAttribute('href') || '');
-      var active = isHome ? (f2 === 'index.html') : (f2 === file);
-      a.classList.toggle('is-active', active);
-      if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
-    });
-
-    if (tbarLabel) tbarLabel.textContent = isHome ? '单文件小工具合集' : (t ? t.name : '工具名称');
-
-    var db = document.querySelector('[data-region="detail-bar"]');
-    if (db) {
-      if (!isHome && t) {
-        var n = db.querySelector('[data-region="detail-name"]');
-        var d = db.querySelector('[data-region="detail-desc"]');
-        if (n) n.textContent = t.name;
-        if (d) d.textContent = t.desc;
-        db.hidden = false;
-      } else {
-        db.hidden = true;
-      }
-    }
-    document.title = isHome ? 'htools · HTML 小工具合集' : (t ? t.name + ' · htools' : 'htools');
-  }
-
-  /* ---------- 侧栏链接按当前目录重写（SPA 换页后相对路径保持正确） ---------- */
-  function syncSidebarHrefs(url) {
-    var dir = url.split('#')[0].split('?')[0].split('/').slice(0, -1).join('/') + '/';
-    toolItems.forEach(function (it) { it.a.href = dir + it.tool.file; });
-    Array.prototype.forEach.call(document.querySelectorAll('#sidebar a[data-home]'), function (a) {
-      a.href = dir + 'index.html#tools';
-    });
-    var brand = document.querySelector('.topbar .brand');
-    if (brand) brand.href = dir + 'index.html';
-  }
-
-  /* ---------- 页面级监听登记（换页时自动移除） ---------- */
-  var pageCleanups = [];
-  function onPageCleanup(fn) { pageCleanups.push(fn); }
-  function onPageEvent(target, type, fn, opts) {
-    target.addEventListener(type, fn, opts);
-    onPageCleanup(function () { target.removeEventListener(type, fn, opts); });
-  }
-  function runPageCleanups() {
-    pageCleanups.splice(0).forEach(function (fn) { try { fn(); } catch (e) {} });
-  }
-  window.htoolsPageEvent = onPageEvent;
-  window.htoolsOnPageCleanup = onPageCleanup;
-
-  /* ---------- 侧栏开合 ---------- */
   var mqWide = window.matchMedia('(min-width: 90rem)');
   var userTookOver = false;
 
@@ -1193,7 +1189,6 @@
   }
   syncSidebar();
 
-  /* ---------- 深浅色：默认跟随系统，手动选择后记住并停止跟随 ---------- */
   var mqDark = window.matchMedia('(prefers-color-scheme: dark)');
   function storedTheme() {
     try { return localStorage.getItem('htools:theme'); } catch (e) { return null; }
@@ -1217,106 +1212,9 @@
       if (!storedTheme()) applyTheme(e.matches ? 'dark' : 'light', false);
     });
   }
-
-  /* ---------- "/" 聚焦搜索（首页存在搜索框时生效） ---------- */
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
-    var ae = document.activeElement;
-    if (ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
-    var si = document.getElementById('search-input');
-    if (!si) return;
-    e.preventDefault();
-    si.focus();
-  });
-
-  /* ---------- SPA 路由：fetch 局部换页；file:// 自动退回整页跳转 ---------- */
-  var SPA = location.protocol === 'http:' || location.protocol === 'https:';
-
-  function runPageScripts(doc) {
-    Array.prototype.forEach.call(doc.querySelectorAll('script[data-page]'), function (old) {
-      var s = document.createElement('script');
-      s.textContent = old.textContent;
-      document.body.appendChild(s);
-    });
-  }
-
-  function applyRoute(url, push) {
-    runPageCleanups();
-    fetch(url, { credentials: 'same-origin' }).then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    }).then(function (html) {
-      var doc = new DOMParser().parseFromString(html, 'text/html');
-
-      /* 页面样式：移除上一页注入的，注入本页的 */
-      Array.prototype.forEach.call(document.querySelectorAll('style[data-injected]'), function (s) {
-        s.parentNode.removeChild(s);
-      });
-      Array.prototype.forEach.call(doc.querySelectorAll('style[data-page-style]'), function (old) {
-        var s = document.createElement('style');
-        s.setAttribute('data-injected', '');
-        s.textContent = old.textContent;
-        document.head.appendChild(s);
-      });
-
-      var lbl = doc.querySelector('[data-region="tbar-label"]');
-      if (lbl && tbarLabel) tbarLabel.textContent = lbl.textContent;
-
-      var c = doc.querySelector('[data-region="content"]');
-      if (c && contentScroll) contentScroll.innerHTML = c.innerHTML;
-
-      var db = doc.querySelector('[data-region="detail-bar"]');
-      var myDb = document.querySelector('[data-region="detail-bar"]');
-      if (myDb) {
-        if (db) { myDb.innerHTML = db.innerHTML; myDb.hidden = false; }
-        else { myDb.hidden = true; }
-      }
-
-      runPageScripts(doc);
-      syncRoute(url);
-      syncSidebarHrefs(url);
-
-      var hash = url.split('#')[1] || '';
-      if (contentScroll) {
-        if (hash) {
-          var target = document.getElementById(hash);
-          if (target) {
-            contentScroll.scrollTop = target.getBoundingClientRect().top
-              - contentScroll.getBoundingClientRect().top
-              + contentScroll.scrollTop - 8;
-          } else contentScroll.scrollTop = 0;
-        } else contentScroll.scrollTop = 0;
-      }
-      if (push) {
-        try { history.pushState({ htools: 1 }, '', url); } catch (e) {}
-      }
-    }).catch(function () {
-      location.href = url;
-    });
-  }
-
-  if (SPA) {
-    document.addEventListener('click', function (e) {
-      var a = e.target && e.target.closest ? e.target.closest('a[data-nav]') : null;
-      if (!a) return;
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-      var href = a.getAttribute('href');
-      if (!href || href.charAt(0) === '#') return;
-      e.preventDefault();
-      applyRoute(href, true);
-    });
-    window.addEventListener('popstate', function () {
-      applyRoute(location.href, false);
-    });
-  }
-
-  /* ---------- 启动 ---------- */
-  renderFavGroup();
-  syncRoute(location.href);
-  syncSidebarHrefs(location.href);
 })();
 </script>
-<script data-page>
+<script>
 /* ============================================================
    工具脚本（图片水印）：逻辑未改动，仅外壳与 token 迁移
    ============================================================ */
@@ -2061,7 +1959,7 @@
       addFiles(e.dataTransfer.files);
     }
   });
-  window.htoolsPageEvent(window, 'paste', function(e){
+  window.addEventListener('paste', function(e){
     if(!e.clipboardData || !e.clipboardData.files || !e.clipboardData.files.length) return;
     addFiles(e.clipboardData.files);
   });
@@ -2318,12 +2216,10 @@
       render();
     });
   }
-  window.htoolsPageEvent(window, 'resize', queueRender);
-  window.htoolsPageEvent(window, 'orientationchange', function(){ setTimeout(queueRender, 260); });
+  window.addEventListener('resize', queueRender);
+  window.addEventListener('orientationchange', function(){ setTimeout(queueRender, 260); });
   if(window.ResizeObserver){
-    var ro = new ResizeObserver(queueRender);
-    ro.observe(stageInner);
-    window.htoolsOnPageCleanup(function(){ ro.disconnect(); });
+    new ResizeObserver(queueRender).observe(stageInner);
   }
 
   buildThumbs();
