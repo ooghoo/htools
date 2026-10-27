@@ -91,7 +91,6 @@ git push
 
 - 纯 HTML + CSS + 原生 JavaScript，无任何构建步骤、无框架、无依赖
 - 首页的工具列表由 `tools.js` 注册表驱动，用普通 `<script src>` 加载，因此在 `file://` 下也能正常工作
-- 页面间通过 SPA 路由切换（fetch 局部换页 + History API），不再整页跳转；`file://` 直接打开时自动退回整页跳转
 - 所有交互均为实时计算，不发任何网络请求
 
 ## 📄 各工具说明
