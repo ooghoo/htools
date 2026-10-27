@@ -54,7 +54,7 @@
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--space-6) clamp(16px, 3vw, 36px) var(--space-10);
+  padding: var(--space-6) 24px var(--space-10);
 }
 
 .backdrop {

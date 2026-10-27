@@ -1,18 +1,26 @@
 .head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--space-3);
+  min-width: 0;
+  padding-bottom: var(--space-3);
+  background: var(--background-95);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--border);
 }
 
 .back {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  align-self: flex-start;
-  padding: 2px 8px 2px 4px;
-  margin-left: -4px;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
   color: var(--muted-foreground);
   transition:
     background-color var(--duration-fast) ease,
@@ -25,15 +33,8 @@
 }
 
 .back svg {
-  width: 14px;
-  height: 14px;
-}
-
-.identity {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .titles {
@@ -41,6 +42,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .title-row {

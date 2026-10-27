@@ -39,13 +39,12 @@ export default function ByteConverter() {
 
   return (
     <>
-      <Card title="输入" subtitle="一次输入，同时给出 1024 与 1000 两种进制的结果">
+      <Card>
         <div className={s['input-row']}>
           <Field
             label="数值"
             htmlFor="amount-input"
             error={invalid ? '请输入数字，支持小数与科学计数法（如 1.5e3）。' : undefined}
-            hint={!invalid ? '可带千分位逗号；负数也按同样的比例换算。' : undefined}
           >
             <Input
               id="amount-input"
@@ -69,19 +68,16 @@ export default function ByteConverter() {
               aria-label="输入单位"
             />
           </Field>
-        </div>
-
-        <div>
           <Button
+            className={s['reset-btn']}
             variant="ghost"
-            size="sm"
             icon={RotateCcw}
             onClick={() => {
               setAmount('1')
               setUnitKey('B')
             }}
           >
-            重置为 1 字节
+            重置
           </Button>
         </div>
       </Card>

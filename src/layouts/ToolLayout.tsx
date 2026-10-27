@@ -23,32 +23,30 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
   return (
     <>
       <div className={s.head}>
-        <Link to="/" className={s.back}>
+        <Link to="/" className={s.back} aria-label="返回全部工具">
           <ArrowLeft aria-hidden="true" />
-          全部工具
         </Link>
 
-        <div className={s.identity}>
-          <ToolIcon icon={tool.icon} accent={tool.accent} size="lg" />
-          <div className={s.titles}>
-            <div className={s['title-row']}>
-              <h1 className={s.title}>{tool.name}</h1>
-              <span className={s.tag}>{categoryLabel(tool.category)}</span>
-            </div>
-            <p className={s.desc}>{tool.description}</p>
-          </div>
+        <ToolIcon icon={tool.icon} accent={tool.accent} size="lg" />
 
-          <button
-            type="button"
-            className={s.fav}
-            data-on={favorite}
-            aria-pressed={favorite}
-            onClick={() => toggleFavorite(tool.id)}
-          >
-            <Heart aria-hidden="true" />
-            <span>{favorite ? '已收藏' : '收藏'}</span>
-          </button>
+        <div className={s.titles}>
+          <div className={s['title-row']}>
+            <h1 className={s.title}>{tool.name}</h1>
+            <span className={s.tag}>{categoryLabel(tool.category)}</span>
+          </div>
+          <p className={s.desc}>{tool.description}</p>
         </div>
+
+        <button
+          type="button"
+          className={s.fav}
+          data-on={favorite}
+          aria-pressed={favorite}
+          onClick={() => toggleFavorite(tool.id)}
+        >
+          <Heart aria-hidden="true" />
+          <span>{favorite ? '已收藏' : '收藏'}</span>
+        </button>
       </div>
 
       <div className={s.body}>{children}</div>

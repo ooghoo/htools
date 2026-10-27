@@ -1,8 +1,14 @@
 .input-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 176px;
+  grid-template-columns: minmax(0, 1fr) 176px auto;
   gap: var(--space-3);
-  align-items: start;
+  align-items: end;
+}
+
+.input-row .reset-btn {
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
 }
 
 .section {
@@ -128,5 +134,10 @@
 @media (max-width: 560px) {
   .input-row {
     grid-template-columns: 1fr;
+  }
+
+  .reset-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
