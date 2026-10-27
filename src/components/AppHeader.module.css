@@ -1,0 +1,146 @@
+.topbar {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
+  background: var(--background-95);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+  transition:
+    background-color var(--duration-fast) ease,
+    transform 0.1s ease;
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-btn:hover {
+  background: var(--accent);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.mark {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.mark svg {
+  width: 14px;
+  height: 14px;
+}
+
+.name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.tagline {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 主题按钮：日月图标交叉淡入 */
+.theme .moon {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--duration-base) ease,
+    transform var(--duration-base) ease;
+}
+
+.theme .sun {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+  transition:
+    opacity var(--duration-base) ease,
+    transform var(--duration-base) ease;
+}
+
+:global(html[data-theme='dark']) .theme .moon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+
+:global(html[data-theme='dark']) .theme .sun {
+  opacity: 1;
+  transform: none;
+}
+
+.theme > span {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 720px) {
+  .tagline,
+  .sep {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .name {
+    display: none;
+  }
+}

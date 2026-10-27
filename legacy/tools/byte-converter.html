@@ -230,15 +230,7 @@
     background-clip: content-box;
   }
   .side-group { display: flex; flex-direction: column; gap: 2px; }
-  .side-label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: var(--muted-foreground);
-    padding: 4px 8px;
-  }
-  .side-label svg { width: 11px; height: 11px; }
+  .side-label { font-size: 12px; color: var(--muted-foreground); padding: 4px 8px; }
   .side-item {
     display: flex;
     align-items: center;
@@ -259,54 +251,6 @@
     width: 6px; height: 6px; border-radius: 999px;
     background: var(--brand);
     flex-shrink: 0;
-  }
-  /* 收藏项：链接 + 取消按钮（分开，避免按钮嵌在链接里） */
-  .side-fav-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    flex: 1;
-    text-decoration: none;
-    color: inherit;
-  }
-  .side-fav-link > span:last-child { overflow: hidden; text-overflow: ellipsis; }
-  .side-tool-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
-  }
-  .side-tool-icon svg { width: 12px; height: 12px; color: #fff; }
-  .side-remove {
-    width: 20px;
-    height: 20px;
-    border: none;
-    border-radius: 5px;
-    background: transparent;
-    color: var(--muted-foreground);
-    cursor: pointer;
-    opacity: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: opacity .15s, background-color .15s, color .15s;
-  }
-  .side-remove svg { width: 11px; height: 11px; }
-  .side-item:hover .side-remove { opacity: 1; }
-  .side-remove:hover { background: var(--muted); color: var(--foreground); }
-  .side-remove:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
-  @media (hover: none) { .side-remove { opacity: 1; } }
-  .side-empty {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--muted-foreground);
-    padding: 2px 8px 6px;
   }
   .side-foot { flex-shrink: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted-foreground); padding: 0 8px; }
 
@@ -353,6 +297,13 @@
     border: 2px solid transparent;
     background-clip: content-box;
   }
+  .content-mask {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 88px;
+    background: linear-gradient(to bottom, transparent, var(--background));
+    pointer-events: none;
+  }
 
   .page { padding: 16px clamp(16px, 3vw, 36px) 36px; }
 
@@ -380,13 +331,11 @@
     padding: 0 16px;
   }
   .conv-input .ca-select {
-    width: 150px;
+    width: 148px;
     flex-shrink: 0;
     height: 46px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
-    padding: 0 34px 0 16px;
-    background-position: right 14px center;
   }
   @media (max-width: 480px) {
     .conv-input { flex-direction: column; }
@@ -490,24 +439,6 @@
   }
   .ca-note--center { text-align: center; max-width: 640px; margin: 0 auto; width: 100%; }
 
-  /* 折叠切换：ZB / YB 默认收起 */
-  .unit-more {
-    display: block;
-    margin: 0 auto;
-    border: 0;
-    background: none;
-    color: var(--brand-foreground);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 8px 14px;
-    letter-spacing: .2px;
-  }
-  .unit-more:hover { opacity: .7 }
-  .unit-more:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); border-radius: 6px }
-  .unit-more .arrow { display: inline-block; margin-left: 2px; transition: transform .2s }
-  .unit-more.open .arrow { transform: rotate(180deg) }
-
   /* ---------- 窄屏：顶栏精简 ---------- */
   @media (max-width: 640px) {
     .tbar-sep, .tbar-label { display: none; }
@@ -593,15 +524,6 @@
               全部工具
             </a>
           </div>
-          <!-- 收藏：快捷访问收藏的工具（localStorage 持久化） -->
-          <div class="side-group" id="side-favs">
-            <p class="side-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-              收藏
-            </p>
-            <div id="fav-list"></div>
-            <p class="side-empty" id="fav-empty">还没有收藏的工具。</p>
-          </div>
           <div class="side-group" id="side-tools" hidden>
             <p class="side-label">工具</p>
           </div>
@@ -631,7 +553,6 @@
 
               <!-- 单位卡片 -->
               <div class="unit-grid" id="unitGrid"></div>
-              <button class="unit-more" id="unitMore" type="button" aria-expanded="false">展开更多单位 <span class="arrow">▾</span></button>
 
               <p class="ca-note ca-note--center">
                 二进制（1024）：Windows 内存与文件系统的算法 · 十进制（1000）：macOS 与硬盘厂商的算法 · <code>1 Byte = 8 bit</code>
@@ -640,6 +561,7 @@
             <!-- ========== 工具内容结束 ========== -->
           </div>
         </div>
+        <div class="content-mask" aria-hidden="true"></div>
       </main>
     </div>
 
@@ -658,8 +580,6 @@
   var sidebarToggle = document.getElementById('sidebar-toggle');
   var sidebarBackdrop = document.getElementById('sidebar-backdrop');
   var sideTools = document.getElementById('side-tools');
-  var favList = document.getElementById('fav-list');
-  var favEmpty = document.getElementById('fav-empty');
   var tbarLabel = document.getElementById('tbar-label');
   var detailName = document.getElementById('detail-name');
   var detailDesc = document.getElementById('detail-desc');
@@ -669,13 +589,6 @@
   var list = (typeof TOOLS !== 'undefined' && Array.isArray(TOOLS)) ? TOOLS : [];
   var me = '';
   try { me = decodeURIComponent(location.pathname.split('/').pop() || ''); } catch (e) {}
-
-  function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  function iconSvg(inner, w) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.6) + '" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
-  }
 
   var current = null;
   if (list.length) {
@@ -702,52 +615,6 @@
     detailDesc.textContent = current.desc;
     document.title = current.name + ' · htools';
   }
-
-  /* ---------- 侧栏收藏栏（与首页一致，localStorage 持久化） ---------- */
-  var FAV_KEY = 'htools:favs';
-  var favs = new Set();
-  try {
-    var rawFavs = localStorage.getItem(FAV_KEY);
-    if (rawFavs) JSON.parse(rawFavs).forEach(function (id) { favs.add(id); });
-  } catch (e) {}
-  function favId(t) { return t.id || t.file; }
-  function saveFavs() {
-    try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs))); } catch (e) {}
-  }
-  function renderFavGroup() {
-    favList.innerHTML = '';
-    var favTools = list.filter(function (t) { return favs.has(favId(t)); });
-    favEmpty.hidden = favTools.length > 0;
-    favTools.forEach(function (t) {
-      var row = document.createElement('div');
-      row.className = 'side-item';
-
-      var link = document.createElement('a');
-      link.className = 'side-fav-link';
-      link.href = t.file;
-      link.innerHTML =
-        '<span class="side-tool-icon" style="background-color:' + (t.accent || '#0071e3') + '" aria-hidden="true">' +
-          iconSvg(ICONS[t.icon] || ICONS.plus, 2) +
-        '</span>' +
-        '<span>' + esc(t.name) + '</span>';
-
-      var remove = document.createElement('button');
-      remove.type = 'button';
-      remove.className = 'side-remove';
-      remove.setAttribute('aria-label', '取消收藏 ' + t.name);
-      remove.innerHTML = iconSvg('<path d="M18 6L6 18M6 6l12 12"/>', 2.4);
-      remove.addEventListener('click', function () {
-        favs.delete(favId(t));
-        saveFavs();
-        renderFavGroup();
-      });
-
-      row.appendChild(link);
-      row.appendChild(remove);
-      favList.appendChild(row);
-    });
-  }
-  renderFavGroup();
 
   var mqWide = window.matchMedia('(min-width: 90rem)');
   var userTookOver = false;
@@ -825,27 +692,9 @@
   var numInput = document.getElementById('numInput');
   var unitSelect = document.getElementById('unitSelect');
   var unitGrid = document.getElementById('unitGrid');
-  var unitMore = document.getElementById('unitMore');
 
   var state = { value: 1, unit: 1 }; // 默认 1 字节
   var cards = [];                    /* { data, cells: [numEl × 2], copyBtns } */
-
-  /* ZB / YB 默认折叠 */
-  var FOLD_FROM = 7;
-  var expanded = false;
-
-  function applyFold() {
-    cards.forEach(function (c, i) {
-      c.el.hidden = i >= FOLD_FROM && !expanded;
-    });
-    unitMore.classList.toggle('open', expanded);
-    unitMore.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-    unitMore.innerHTML = (expanded ? '收起更多单位 ' : '展开更多单位 ') + '<span class="arrow">▾</span>';
-  }
-  unitMore.addEventListener('click', function () {
-    expanded = !expanded;
-    applyFold();
-  });
 
   function factorOf(def, base) {
     if (def.power === null) return 1 / 8; // bit = Byte / 8
@@ -937,7 +786,6 @@
     unitGrid.appendChild(c.el);
     cards.push(c);
   });
-  applyFold();
 
   /* ---------- 渲染：每个单位给出两种进制的值 ---------- */
   function render() {

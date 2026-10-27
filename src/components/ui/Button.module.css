@@ -1,0 +1,122 @@
+.base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--control-h);
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    transform 0.1s ease;
+  user-select: none;
+}
+
+.base svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.base:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.base:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sm {
+  height: var(--control-h-sm);
+  padding: 0 9px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  gap: 5px;
+}
+
+.sm svg {
+  width: 13px;
+  height: 13px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+/* ---------- 变体 ---------- */
+.primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--primary);
+  filter: brightness(1.18);
+}
+
+.secondary {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
+  box-shadow: var(--shadow-xs);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--border);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.danger {
+  background: transparent;
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+/* 纯图标按钮 */
+.icon {
+  width: var(--control-h);
+  padding: 0;
+}
+
+.icon.sm {
+  width: var(--control-h-sm);
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

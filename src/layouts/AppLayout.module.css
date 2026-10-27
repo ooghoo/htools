@@ -1,0 +1,129 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--card) 0%, var(--brand-1) 55%, var(--brand-2) 100%);
+}
+
+.main-row {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+}
+
+.sidebar-slot {
+  display: none;
+  flex-shrink: 0;
+}
+
+.shell[data-sidebar='open'] .sidebar-slot {
+  display: flex;
+}
+
+.content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--brand-2);
+  border-radius: var(--radius-panel);
+  background: var(--background-95);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) clamp(16px, 3vw, 36px) var(--space-10);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 0.28);
+  backdrop-filter: blur(2px);
+  border: none;
+  animation: fade-in var(--duration-base) ease;
+  cursor: default;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- 窄屏：侧栏变抽屉 ---------- */
+@media (max-width: 1023px) {
+  .sidebar-slot {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    padding-left: max(8px, env(safe-area-inset-left));
+    background: var(--background);
+    border-right: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    animation: slide-in var(--duration-base) var(--ease-out);
+  }
+
+  .shell[data-sidebar='open'] .sidebar-slot {
+    display: flex;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-row {
+    gap: 0;
+    padding: 0 0 max(0px, env(safe-area-inset-bottom)) 0;
+  }
+
+  .content {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    box-shadow: none;
+  }
+
+  .page {
+    padding: var(--space-4) var(--space-4) var(--space-8);
+    gap: var(--space-5);
+  }
+}

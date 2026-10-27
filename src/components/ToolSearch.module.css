@@ -1,0 +1,109 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 320px;
+  height: var(--control-h);
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  background: var(--card);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    max-width 0.2s var(--ease-out);
+}
+
+.wrap:hover {
+  border-color: var(--ring);
+}
+
+.wrap:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px var(--brand-2);
+  max-width: 380px;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--text-base);
+}
+
+.input::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* 键盘提示：输入框为空且未聚焦时显示 */
+.kbd {
+  flex-shrink: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.wrap:focus-within .kbd,
+.wrap[data-filled='true'] .kbd {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.clear {
+  width: 20px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+}
+
+.clear svg {
+  width: 13px;
+  height: 13px;
+}
+
+.clear:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.wrap[data-filled='true'] .clear {
+  display: inline-flex;
+}
+
+@media (max-width: 640px) {
+  .wrap,
+  .wrap:focus-within {
+    max-width: none;
+  }
+
+  .kbd {
+    display: none;
+  }
+}

@@ -1,119 +1,315 @@
-# HTML 小工具 · Web Tools
+# htools · 个人 Web 工具集
 
-一个纯前端、零依赖的 HTML 小工具合集。
+一个自用的轻量工具集合平台：统一的工具首页、统一的页面框架、统一的视觉规范，每个工具都是独立模块，加一个工具不用碰核心代码。
 
-每个工具都是 `tools/` 下的**一个独立单文件 HTML** —— 不需要起服务、不需要联网、没有任何第三方依赖，把 `.html` 拖进浏览器就能跑。
+纯前端、零后端、零追踪 —— 所有计算都在浏览器里完成，输入不会离开设备。
 
-## 🔗 在线使用
+- 在线地址：https://ooghoo.github.io/htools/
+- 技术栈：React 18 + TypeScript + Vite 6 + React Router 6 + CSS Modules
 
-https://ooghoo.github.io/htools/
+---
 
-首页是控制台风格的工作台：顶栏 + 侧栏导航（导航 / 收藏 / 项目）+ 工具列表（卡片 / 列表双视图、常驻搜索、心形收藏后在侧栏「收藏」栏快捷访问）。深浅色默认跟随系统、可手动切换并记住；页头吸顶，窄屏下滑自动收成标题行；滚动条不挤占内容。桌面 / 平板 / 手机自适应。
-
-## 🧰 工具清单
-
-| 工具 | 说明 | 入口 |
-| --- | --- | --- |
-| 字节换算 · Byte Converter | `bit` / `B` / `KB` … `YB` 实时互转，支持 1024 与 1000 两种进制 | [`tools/byte-converter.html`](tools/byte-converter.html) |
-| 图片水印 · Watermark | 批量加水印，平铺 / 角度 / 字体 / 排版可调，导出按像素缩放 | [`tools/watermark.html`](tools/watermark.html) |
-
-> 合集还在生长，新工具会持续往里补。
-
-## 🖥 本地使用
+## 快速开始
 
 ```bash
-git clone https://github.com/ooghoo/htools.git
+npm install
+
+npm run dev        # 本地开发，http://localhost:5173
+npm run typecheck  # 只跑类型检查
+npm run build      # 类型检查 + 生产构建，产物在 dist/
+npm run preview    # 预览生产产物，http://localhost:4173
+npm run lint       # ESLint
 ```
 
-- 打开全部工具：双击根目录 `index.html`
-- 只用一个工具：直接双击 `tools/` 里对应的 `.html`（工具页品牌 Logo 点击回首页，侧栏可在工具间切换）
+要求 Node 18+（CI 用 Node 20）。
 
-## ➕ 新增一个工具
+---
 
-三步，不需要改首页：
+## 目录结构
 
-1. 复制 **`tools/_template.html`** 为你的工具页，例如 `tools/json-format.html`
-2. 把模版里 `<div class="tool-body">` 的内容换成你的工具 UI（可用模版内置的共享组件，见下）
-3. 在根目录 **`tools.js`** 的 `TOOLS` 数组里追加一条：
+```
+htools/
+├── .github/workflows/deploy.yml   # 构建 + 部署到 GitHub Pages
+├── public/.nojekyll
+├── legacy/                        # v1 零构建静态站原样保留，仅作参考，不参与构建
+├── src/
+│   ├── app/
+│   │   ├── App.tsx                # 路由表
+│   │   ├── providers.tsx          # 主题 / 收藏 / 最近使用 / 轻提示
+│   │   └── contexts.ts            # context 定义与 useTheme / useFavorites 等访问器
+│   ├── components/
+│   │   ├── AppHeader.tsx          # 顶栏
+│   │   ├── Sidebar.tsx            # 侧栏：导航 / 收藏 / 工具（全站同一份）
+│   │   ├── ToolCard.tsx           # 工具卡片与列表行
+│   │   ├── ToolSearch.tsx         # 搜索框（「/」聚焦、Esc 清空）
+│   │   ├── ToolIcon.tsx           # 工具图标底色块
+│   │   ├── EmptyState.tsx
+│   │   ├── ErrorBoundary.tsx      # 单个工具崩溃不影响整站
+│   │   ├── Toast.tsx
+│   │   └── ui/                    # 基础组件：Button / Input / Select / Slider ...
+│   ├── hooks/useMediaQuery.ts
+│   ├── layouts/
+│   │   ├── AppLayout.tsx          # 外壳：顶栏 + 侧栏 + 内容面板
+│   │   └── ToolLayout.tsx         # 工具页框架：返回 / 标题 / 描述 / 收藏
+│   ├── pages/
+│   │   ├── HomePage.tsx           # 首页：分类分组 + 搜索 + 收藏 + 最近使用
+│   │   ├── ToolPage.tsx           # /tools/:toolId
+│   │   ├── AboutPage.tsx
+│   │   └── NotFoundPage.tsx
+│   ├── registry/
+│   │   ├── categories.ts          # 分类定义
+│   │   └── tools.ts               # ★ 工具注册表
+│   ├── services/storage.ts        # LocalStorage 封装（全异常兜底）
+│   ├── styles/
+│   │   ├── tokens.css             # ★ 设计令牌
+│   │   └── global.css             # reset + 文档级排版 + 小工具类
+│   ├── tools/
+│   │   ├── color-converter/
+│   │   │   ├── index.tsx          # 组件（default export）
+│   │   │   ├── logic.ts           # 纯函数：解析与换算
+│   │   │   ├── manifest.ts        # 元数据
+│   │   │   └── styles.module.css
+│   │   ├── json-formatter/
+│   │   ├── timestamp-converter/
+│   │   ├── byte-converter/
+│   │   └── watermark/
+│   ├── types/tool.ts
+│   ├── utils/
+│   └── main.tsx
+├── index.html
+├── vite.config.ts
+├── tsconfig.json
+└── eslint.config.js
+```
 
-   ```js
-   {
-     id: 'json-format',
-     name: 'JSON 格式化',
-     desc: '美化 / 压缩 JSON，支持语法高亮与错误定位',
-     file: 'tools/json-format.html',
-     accent: '#34c759',   // 图标底色，留空则用默认蓝
-     icon: 'code'         // 图标名，见 index.html 里的 ICONS
-   }
-   ```
+---
 
-注册后，首页卡片、工具页页头（图标 / 名称 / 描述 / 文件路径）、侧栏高亮都会自动生成，不用手动写返回链接。
+## 架构要点
 
-## 🧩 工具页模版（tools/_template.html）
+### 路由
 
-所有工具页统一套 `tools/_template.html`，框架固定（勿改）：
+| 路径 | 页面 |
+| --- | --- |
+| `/#/` | 工具首页（`?cat=convert` 可直达某个分类） |
+| `/#/tools/:toolId` | 工具页，`toolId` 来自注册表 |
+| `/#/about` | 平台说明 |
+| `/#/*` | 404（也包括访问未注册 / 已停用的工具） |
 
-- **顶栏**：侧栏开关 / 品牌（点回首页）/ 上下文标签 ｜ GitHub / 深浅色，高 56，一级二级页面一致
-- **页头栏**：标题 + 描述（由 tools.js 注册表自动填充），不随滚动动
-- **内容区**：自定义，放在 `.tool-body` 里，滚动只发生在这一区；画布类工具加 `page--fill` 让内容撑满、由工具自己管理内部布局
-- **侧栏**：导航（全部工具）+ 工具列表（当前页高亮）
+用 **HashRouter**，不是 BrowserRouter。原因是 GitHub Pages 不支持 SPA 回退，`/tools/xxx` 这种深层路径刷新会 404；hash 部分不参与服务端请求，所以：
 
-标题 / 描述、侧栏高亮都从 `tools.js` 注册表自动读取。模版内置共享组件，工具 UI 直接组合使用：
+- 深层链接刷新、直接粘贴打开都能用；
+- 浏览器前进 / 后退正常；
+- `base: './'` 让同一个 `dist` 可以放在任意子路径（项目站点 `/htools/`、自定义域名根目录都可以），不用改配置。
+
+每个工具用 `React.lazy` 单独打包，首页只加载注册表，进工具时才下载对应 chunk。
+
+### 工具注册机制
+
+首页展示、搜索、分类、路由查找**全部**基于 `src/registry/tools.ts`，没有一处 `if (toolId === 'xxx')` 的硬编码。
+
+新增工具的完整流程：
+
+**1. 建目录**
+
+```
+src/tools/my-tool/
+├── index.tsx
+├── manifest.ts
+└── styles.module.css
+```
+
+**2. 写元数据 `manifest.ts`**
+
+```ts
+import { Wand } from 'lucide-react'
+import type { ToolMeta } from '@/types/tool'
+
+export const manifest: ToolMeta = {
+  id: 'my-tool',                 // 唯一 ID，同时是路由参数，发布后别再改
+  name: '我的工具',
+  description: '一句话说明，24 字以内，卡片和工具页共用',
+  category: 'text',              // convert | text | image
+  icon: Wand,                    // 统一用 lucide-react
+  accent: '#10b981',             // 图标底色
+  keywords: ['my', 'tool', '别名', '关键词'],  // 参与搜索
+  order: 20,                     // 同分类内的排序，小的在前；不填按名称排
+  enabled: true,                 // 设 false 即下线：首页不显示，路由直接 404
+}
+```
+
+**3. 写组件 `index.tsx`（default export，不接收 props）**
+
+```tsx
+import { Card } from '@/components/ui/Card'
+
+export default function MyTool() {
+  return <Card title="标题">工具内容</Card>
+}
+```
+
+**4. 注册**
+
+```ts
+// src/registry/tools.ts
+import { manifest as myTool } from '@/tools/my-tool/manifest'
+
+export const TOOL_REGISTRY: ToolDefinition[] = [
+  // ...
+  { ...myTool, component: lazy(() => import('@/tools/my-tool')) },
+]
+```
+
+保存后：首页自动出现（按分类归组、参与搜索）、`/#/tools/my-tool` 自动可用、侧栏计数自动更新。不需要改路由、不需要改首页。
+
+### 模块隔离
+
+- 每个工具自己管业务状态与局部样式，不读别的工具的文件；
+- 与平台交互只通过 `@/components/ui/*`、`@/app/contexts` 和 `@/types/tool`；
+- 工具渲染异常会被 `ErrorBoundary` 拦住，只坏自己那一块；
+- 删掉一个工具 = 删目录 + 删注册表里那一行，其余不受影响。
+
+---
+
+## 设计系统
+
+所有颜色、字号、间距、圆角、阴影都在 `src/styles/tokens.css`，按语义命名（`--background` / `--card` / `--border` / `--muted-foreground` / `--brand` / `--danger` …），一套 token 同时喂 Light 和 Dark。
+
+**规矩**：工具里不写死颜色值，只用 `var(--*)`；需要页面私有变量时用 `--t-` 前缀，避免和全局 token 撞名。
+
+可复用组件（`src/components/ui/`）：
 
 | 组件 | 用途 |
 | --- | --- |
-| `ca-card` | 内容卡片（`ca-card--narrow` 为居中窄卡） |
-| `ca-input` / `ca-select` | 输入框 / 下拉（高 36） |
-| `ca-seg` | 分段切换（如 Windows / Mac） |
-| `ca-btn` / `ca-btn--primary` | 次按钮 / 主按钮 |
-| `ca-rows` / `ca-row` | 结果列表（分隔线 + hover + 行内操作） |
-| `ca-note` / `ca-kbd` / `ca-badge` | 说明 / 键帽 / 徽标 |
-| `ca-empty` | 空状态 |
+| `Button` / `LinkButton` | 主 / 次 / 幽灵 / 危险 四种变体，`loading`、`iconOnly` |
+| `Input` / `TextArea` / `Select` | 表单控件，统一高度、焦点环、错误态；`Input` / `Select` 另有 `size="lg"`（46px 主输入） |
+| `Field` | 标签 + 控件 + 说明 / 错误的一体外壳 |
+| `Slider` / `Toggle` / `Segmented` / `Chips` | 连续调节、开关、互斥切换、快捷标签 |
+| `Card` | 内容卡片（`narrow` 窄卡、`flush` 去内边距） |
+| `ValueList` | 结果列表：标签 + 等宽值 + 复制按钮 |
+| `CopyButton` | 复制 + 成功提示，内部处理降级 |
+| `EmptyState` | 空状态 |
+| `Toast` | 全局轻提示 |
 
-约定：
+响应式：`≥1440px` 侧栏默认展开；`1024–1439px` 内联收起；`<1024px` 侧栏变抽屉并加遮罩；`<640px` 内容面板铺满、卡片单列。
 
-- **一个工具 = 一个自包含的 `.html`**，样式和脚本内联，不引外部 CDN，保证离线可用
-- 样式只用共享 token 与 `ca-*` 组件；需要局部别名时用 `--t-` 前缀，不要重定义 token 名（`--card` / `--accent` 等），会撞车
-- 深浅色、返回首页、侧栏导航模版已内置，工具页不用自己处理
-- 参考实现：`tools/byte-converter.html`
+---
 
-## 📦 自行部署
+## 数据与隐私
 
-本项目通过 GitHub Pages 托管（`main` 分支根目录，保留 `.nojekyll`）。push 到 `main` 后会自动更新。
+- 不请求任何后端，不加载外部字体 / 统计脚本，不发任何网络请求（除页面自身静态资源）。
+- 工具输入只存在内存里，刷新即清空。
+- 只在 LocalStorage 记三类偏好，且全部读写在 `src/services/storage.ts` 里做了 try/catch（Safari 无痕、配额写满、被策略禁用都不会白屏）：
+
+| 键 | 内容 |
+| --- | --- |
+| `htools:favs` | 收藏的工具 ID 数组（沿用 v1 的键，老收藏能继承） |
+| `htools:recent` | 最近使用：`{ id, at }[]`，最多 6 条，**不含任何输入内容** |
+| `htools:theme` | `light` / `dark`，不设则跟随系统 |
+| `htools:view` | 首页卡片 / 列表视图 |
+
+- 用户输入只作为文本节点渲染，没有 `dangerouslySetInnerHTML`。
+- 浏览器不支持 Clipboard API（http 内网、非安全上下文）时自动降级为 `execCommand('copy')`。
+
+---
+
+## 部署到 GitHub Pages
+
+工作流在 `.github/workflows/deploy.yml`：推 `main` → 装依赖 → 类型检查 + 构建 → 上传 `dist` → 发布到 Pages。
+
+### 首次配置（只需做一次）
+
+1. 确认代码已推到 GitHub 仓库的 `main` 分支。
+2. 打开仓库 **Settings → Pages**，把 **Source** 从「Deploy from a branch」改成 **「GitHub Actions」**。
+   > 这一步必须做。原来的分支部署（根目录）会和 Actions 部署冲突，且根目录已经不再是站点源码。
+3. 打开 **Settings → Actions → General → Workflow permissions**，确认允许 GitHub Actions 读写（默认即可，工作流已声明所需权限）。
+4. 推一次代码或在 **Actions** 页手动 **Run workflow**，等 `Build` + `Deploy` 两个 job 变绿。
+
+站点地址：`https://<用户名>.github.io/<仓库名>/`
+
+### 关于 base 路径
+
+`vite.config.ts` 里 `base: './'`。产物里的资源引用是相对路径，配合 HashRouter 后：
+
+- 放在 `/<仓库名>/` 子路径 ✅
+- 放在自定义域名根目录 ✅
+- 换仓库名不用改配置 ✅
+
+如果以后改成 BrowserRouter，就必须把 `base` 显式设成 `/仓库名/`，并且额外处理 404 回退（例如 `404.html` 复制 `index.html`）—— 这也是本项目继续用 HashRouter 的原因。
+
+### 本地验证部署产物
 
 ```bash
-git add .
-git commit -m "add xxx tool"
-git push
+npm run build
+npm run preview     # 打开 http://localhost:4173
 ```
 
-## 🛠 技术说明
+`dist/` 是纯静态文件，扔到任何静态服务器（Nginx、Vercel、Netlify、对象存储）都能跑。
 
-- 纯 HTML + CSS + 原生 JavaScript，无任何构建步骤、无框架、无依赖
-- 首页的工具列表由 `tools.js` 注册表驱动，用普通 `<script src>` 加载，因此在 `file://` 下也能正常工作
-- 所有交互均为实时计算，不发任何网络请求
+---
 
-## 📄 各工具说明
+## 已完成的首批工具
 
-### 字节换算 · Byte Converter
+| 工具 | 能力 | 本地逻辑文件 |
+| --- | --- | --- |
+| 颜色转换 | HEX / `rgb()` / `hsl()` 输入互转，色块预览，逐项复制，非法输入即时提示 | `tools/color-converter/logic.ts` |
+| JSON 格式化 | 2 / 4 空格 / Tab 缩进，格式化、压缩、合法性校验、错误定位到行列、复制、下载 `.json` | `tools/json-formatter/logic.ts` |
+| 时间戳转换 | 秒 / 毫秒双向解释，本地时间 / UTC / ISO 8601，明确标注时区与偏移，非法输入校验 | `tools/timestamp-converter/logic.ts` |
+| 字节换算 | `bit` ~ `YB` 全单位（默认展开到 `EB`，`ZB` / `YB` 折叠），同时给出 1024 与 1000 两种进制，粘贴即算 | `tools/byte-converter/logic.ts` |
+| 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip | `tools/watermark/render.ts` |
 
-从百度搜索结果页的换算器单独抽出，去掉了所有无关的搜索列表与热搜，只保留纯粹的换算功能。
+---
 
-- **实时换算**：输入数值即出结果，无需点击按钮
-- **完整单位**：`bit` / `B` / `KB` / `MB` / `GB` / `TB` / `PB` / `EB` / `ZB` / `YB`
-- **双规则切换**：Windows 二进制 `1 KB = 1024 B`；Mac 十进制 SI `1 KB = 1000 B`（`1 Byte = 8 bit`，bit 始终不受进制影响）
-- **默认展开到 TB**，更大的单位（PB / EB / ZB / YB）折叠在「展开更多单位」下
-- **结果保留 2 位小数**（极小值自动切换科学计数法，避免被吞成 `0.00`）
-- **一键复制**：每行结果悬停即出现复制按钮
+## 验收记录
 
-### 图片水印 · Watermark
+构建与检查（本地实测）：
 
-给照片批量加水印，全程在浏览器本地用 Canvas 处理，图片不会离开设备。
+| 检查 | 命令 | 结果 |
+| --- | --- | --- |
+| TypeScript 类型检查 | `npm run typecheck` | ✅ 0 error |
+| ESLint | `npm run lint` | ✅ 0 problem |
+| 生产构建 | `npm run build` | ✅ 成功，首页 JS gzip ≈ 68 KB，工具按需分块 |
+| 预览产物 | `npm run preview` | ✅ 可访问 |
 
-- **批量处理**：点选 / 拖入 / 粘贴，缩略图条切换预览，单张删除
-- **样式全局统一**：一套样式应用到所有图片，改一处即全部生效
-- **平铺与单个**：平铺铺满或单个水印，角度 −90°～90°，九宫格定位，横纵间距可调
-- **自动对比**：按每张图的平均亮度自动切白字 / 深色字，浅色照片上不再「看不见」
-- **文字水印**：8 种字体、6 档字重、字号按图宽百分比、字间距、透明度、描边、投影；也支持上传 PNG Logo 作为图片水印
-- **导出**：原图 / 0.5× / 长边 1080 / 自定义长边像素，JPG（自动铺白底）或 PNG，多张自动打包成 zip
-- **离线可用**：ZIP 打包为手写实现，不依赖任何 CDN
+浏览器交互验证（headless Chromium，1440×900，`dist` 产物）：**28 / 28 通过**
+
+| 分组 | 验证项 |
+| --- | --- |
+| 首页 | 5 个工具入口按分类渲染；搜索「json」只剩 1 个结果；无结果时出现空状态并可清除 |
+| 分类 | `?cat=text` 只显示文本分类工具 |
+| 收藏 | 点击收藏写入 LocalStorage，刷新后侧栏仍保留 |
+| 最近使用 | 访问工具后首页出现「最近使用」区块 |
+| 颜色 | 非法输入报错；`#00ff00` → `rgb(0, 255, 0)` / `hsl(120, 100%, 50%)`；3 位简写 `f00` → `#FF0000` |
+| JSON | 示例可格式化（多行）；可压缩为单行；`{"a": 1,}` 报错并定位到行 / 列 |
+| 时间戳 | `1793085342` 秒 → 本地 `2026-10-27 15:15:42`、ISO `2026-10-27T07:15:42.000Z`；显示 `Asia/Shanghai`；切毫秒后重新解释 |
+| 字节 | `1 B` → `8.00 bit`；极小值改用科学计数法（`9.77e-4`），不再显示成 `0.00` |
+| 404 | 未注册工具 ID 与未知路由都进入 404 页 |
+| 水印 | 拖入 320×200 图片后画布绘制成功、中心像素非空、显示尺寸信息、可切到导出面板 |
+| 主题 | 切换深色后 `data-theme` 与 LocalStorage 同步 |
+| 运行时 | 全流程无 console error / page error |
+
+---
+
+## 已知限制
+
+1. **只做纯静态**：没有后端、没有数据库、没有登录。需要服务端的工具（调用 API、存数据、OCR 之类）不适合放进这个仓库，要单独评估。
+2. **偏好不同步**：收藏与最近使用存在当前浏览器，换设备 / 换浏览器不共享。
+3. **图片水印的内存边界**：单张导出受 Canvas 上限约束（约 1677 万像素，超出会等比缩小）；一次导出很多张大会话内存占用高、速度变慢，这是浏览器本地处理的固有限制。
+4. **JSON 大数字精度**：走 `JSON.parse`，超过 `2^53` 的整数会丢精度（与浏览器原生行为一致）。
+5. **时间戳用本机时区**：只有本地时间、UTC、ISO 三种视图，不做任意时区换算。
+6. **HashRouter 的 URL 带 `#`**：换来的是静态托管零配置，见上文取舍说明。
+7. **v1 旧链接失效**：`legacy/` 里的原静态站不再部署，`tools/xxx.html` 旧地址会 404，功能已迁移到新工具页。
+
+---
+
+## 后续可扩展方向
+
+- 按需再接 IndexedDB（例如图片处理草稿、大文本历史），现在 LocalStorage 足够。
+- 给工具加 `tags` 之外的「使用次数」统计，用本地计数驱动首页推荐位。
+- 工具目录再长下去，可以给 `/tools/:toolId` 加子路由做多面板工具。
+- 想要任意时区、正则测试、Diff 之类的新工具，按上面的注册流程加即可，不需要动核心。
+
+---
+
+## 关于 `legacy/`
+
+`legacy/` 是重写前的零构建版本（首页 + `tools.js` 注册表 + 单文件工具页），完整保留在仓库里方便对照旧实现细节（尤其是水印的绘制算法与 zip 打包）。它不在 Vite 的构建范围内，也不会被部署。

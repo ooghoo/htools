@@ -1,0 +1,160 @@
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 2px 8px 2px 4px;
+  margin-left: -4px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.back:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.back svg {
+  width: 14px;
+  height: 14px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.tag {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.desc {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  line-height: var(--leading-relaxed);
+}
+
+.fav {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--control-h-sm);
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  transition:
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.fav svg {
+  width: 14px;
+  height: 14px;
+}
+
+.fav:hover {
+  border-color: var(--ring);
+  color: var(--foreground);
+}
+
+.fav[data-on='true'] {
+  color: var(--t-fav);
+  border-color: color-mix(in srgb, var(--t-fav) 35%, var(--border));
+  background: color-mix(in srgb, var(--t-fav) 7%, var(--card));
+}
+
+.fav[data-on='true'] svg {
+  fill: var(--t-fav);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  animation: fade-rise var(--duration-base) var(--ease-out);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 56px 0;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--border);
+  border-top-color: var(--muted-foreground);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: var(--text-xl);
+  }
+
+  .fav span {
+    display: none;
+  }
+
+  .fav {
+    width: var(--control-h-sm);
+    padding: 0;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,174 @@
+/* ============================================================
+ * 设计令牌 · 单一来源
+ * ------------------------------------------------------------
+ * 所有颜色、字体、间距、圆角、阴影都从这里取值。
+ * 工具组件不得自行写死颜色值；需要局部变量时用 --t- 前缀。
+ *
+ * 色板沿用 CloudAI（aidbs）主题的 Light / Dark 实际取值，
+ * 语义命名与 shadcn 一致，便于后续换肤。
+ * ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- 表面与文字 ---------- */
+  --background: hsl(0 0% 98.82%);
+  --background-95: hsl(0 0% 98.82% / 0.95);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 4.76% 4.12%);
+  --foreground: hsl(240 4.76% 4.12%);
+  --muted: hsl(240 9.09% 95.69%);
+  --muted-foreground: hsl(240 1.1% 64.31%);
+  --secondary-foreground: hsl(240 4.76% 4.12%);
+  --accent: hsl(240 9.09% 95.69%);
+  --accent-foreground: hsl(240 4.55% 8.63%);
+  --border: hsl(220 5.66% 89.61%);
+  --input: hsl(220 5.66% 89.61%);
+  --ring: hsl(240 1.1% 64.31%);
+  --primary: hsl(0 0% 9.02%);
+  --primary-foreground: hsl(0 0% 98.04%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(240 4.76% 4.12%);
+
+  /* ---------- 品牌色：只做识别与强调，不替代 primary ---------- */
+  --brand: hsl(235.65 84.93% 71.37%);
+  --brand-1: hsl(240 100% 98.43%);
+  --brand-2: hsl(236.25 94.12% 93.33%);
+  --brand-6: hsl(235.65 84.93% 71.37%);
+  --brand-foreground: hsl(236.82 73.33% 64.71%);
+
+  /* ---------- 语义状态色 ---------- */
+  --success: hsl(142 71% 35%);
+  --success-bg: hsl(142 60% 96%);
+  --success-border: hsl(142 50% 85%);
+  --danger: hsl(0 72% 47%);
+  --danger-bg: hsl(0 70% 97%);
+  --danger-border: hsl(0 60% 88%);
+  --warning: hsl(32 90% 38%);
+  --warning-bg: hsl(38 92% 96%);
+  --warning-border: hsl(38 70% 85%);
+
+  /* ---------- 侧栏 ---------- */
+  --sidebar-foreground: hsl(240 13.95% 16.86%);
+  --sidebar-accent: hsl(240 18.18% 95.69%);
+  --sidebar-accent-foreground: hsl(240 13.95% 16.86%);
+
+  /* ---------- 页面级私有令牌 ---------- */
+  --t-fav: hsl(348 88% 58%);
+  --t-scrollbar: hsl(240 1.1% 64.31% / 0.42);
+
+  /* ---------- 字体 ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC',
+    'Helvetica Neue', 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-xs: 11.5px;
+  --text-sm: 12.5px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ---------- 间距（4px 基准） ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- 圆角 ---------- */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-card: 12px;
+  --radius-panel: 20px;
+  --radius-pill: 999px;
+
+  /* ---------- 阴影（克制使用，仅浮层与内容面板） ---------- */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.05);
+  --shadow-panel: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* ---------- 布局 ---------- */
+  --topbar-h: 56px;
+  --sidebar-w: 248px;
+  --content-max: 1200px;
+  --control-h: 36px;
+  --control-h-sm: 30px;
+
+  /* ---------- 断点（供媒体查询参考，CSS 变量不能用于 @media） ----------
+   * sm: 640px 以上    手机横屏 / 大屏手机
+   * md: 768px 以上    平板竖屏
+   * lg: 1024px 以上   平板横屏 / 小笔记本
+   * xl: 1280px 以上   桌面
+   * 2xl: 1440px 以上  侧栏默认展开
+   */
+
+  --duration-fast: 0.15s;
+  --duration-base: 0.25s;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --background: hsl(0 0% 3.92%);
+  --background-95: hsl(0 0% 3.92% / 0.95);
+  --card: hsl(0 0% 9.02%);
+  --card-foreground: hsl(0 0% 98.04%);
+  --foreground: hsl(0 0% 98.04%);
+  --muted: hsl(0 0% 14.9%);
+  --muted-foreground: hsl(240 0.83% 52.55%);
+  --secondary-foreground: hsl(0 0% 98.04%);
+  --accent: hsl(0 0% 25.1%);
+  --accent-foreground: hsl(0 0% 98.04%);
+  --border: hsl(0 0% 14.9%);
+  --input: hsl(0 0% 14.9%);
+  --ring: hsl(0 0% 45.1%);
+  --primary: hsl(0 0% 89.8%);
+  --primary-foreground: hsl(0 0% 9.02%);
+  --popover: hsl(0 0% 14.9%);
+  --popover-foreground: hsl(0 0% 98.04%);
+
+  --brand: hsl(234.88 93.18% 82.75%);
+  --brand-1: hsl(237.45 47.47% 19.41%);
+  --brand-2: hsl(236.57 48.61% 28.24%);
+  --brand-6: hsl(234.88 93.18% 82.75%);
+  --brand-foreground: hsl(235.79 93.44% 88.04%);
+
+  --success: hsl(142 62% 62%);
+  --success-bg: hsl(146 40% 13%);
+  --success-border: hsl(146 35% 24%);
+  --danger: hsl(0 80% 68%);
+  --danger-bg: hsl(0 40% 14%);
+  --danger-border: hsl(0 35% 28%);
+  --warning: hsl(38 90% 65%);
+  --warning-bg: hsl(36 40% 14%);
+  --warning-border: hsl(36 35% 26%);
+
+  --sidebar-foreground: hsl(264 100% 99.02%);
+  --sidebar-accent: hsl(0 0% 14.9%);
+  --sidebar-accent-foreground: hsl(0 0% 98.04%);
+
+  --t-fav: hsl(348 90% 68%);
+  --t-scrollbar: hsl(240 0.83% 52.55% / 0.5);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.55), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 10px 20px -6px rgb(0 0 0 / 0.6), 0 4px 8px -4px rgb(0 0 0 / 0.4);
+}
