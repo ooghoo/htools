@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { CopyButton } from '@/components/ui/CopyButton'
 import { Field } from '@/components/ui/Field'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
+import { CopyButton } from '@/components/ui/CopyButton'
 import {
   BASES,
   BYTE_UNITS,
@@ -39,9 +38,11 @@ export default function ByteConverter() {
 
   return (
     <div className={s.tool}>
-      <Card className={s.panel}>
+      {/* 输入区：单一干净的面板，作为整页视觉重心 */}
+      <section className={s.panel} aria-label="输入">
         <div className={s['input-row']}>
           <Field
+            className={s['field-amount']}
             label="数值"
             htmlFor="amount-input"
             error={invalid ? '请输入数字，支持小数与科学计数法（如 1.5e3）。' : undefined}
@@ -58,7 +59,7 @@ export default function ByteConverter() {
               onChange={(event) => setAmount(event.target.value)}
             />
           </Field>
-          <Field label="单位" htmlFor="unit-select">
+          <Field className={s['field-unit']} label="单位" htmlFor="unit-select">
             <Select
               id="unit-select"
               size="lg"
@@ -80,51 +81,57 @@ export default function ByteConverter() {
             重置
           </Button>
         </div>
-      </Card>
+      </section>
 
+      {/* 结果区：对齐的列表，列头说明进制，每行一种单位 */}
       <section className={s.results} aria-label="换算结果">
-        <div className={s['results-bar']}>
-          <p className={s['results-meta']}>
-            共 {BYTE_UNITS.length} 种单位 · 上排 <b>1024</b> 进制，下排 <b>1000</b> 进制
-          </p>
+        <header className={s['results-head']}>
+          <h2 className={s['results-title']}>换算结果</h2>
+          <span className={s['results-count']}>{BYTE_UNITS.length} 种单位</span>
           <Button
+            className={s['expand-btn']}
             variant="ghost"
             size="sm"
             icon={expanded ? ChevronUp : ChevronDown}
             onClick={() => setExpanded((current) => !current)}
           >
-            {expanded ? '收起大单位' : '展开 ZB 及更大单位'}
+            {expanded ? '收起大单位' : '展开全部单位'}
           </Button>
-        </div>
+        </header>
 
-        <div className={s.grid}>
+        <div className={s.list}>
+          <div className={s['list-head']} aria-hidden="true">
+            <span className={s['head-cell']}>单位</span>
+            <span className={`${s['head-cell']} ${s['head-val']}`}>二进制 · 1024</span>
+            <span className={`${s['head-cell']} ${s['head-val']}`}>十进制 · 1000</span>
+            <span className={s['head-cell']} />
+          </div>
+
           {visibleUnits.map((unit) => {
             const values = results?.[unit.key]
             const isSource = unit.key === fromUnit.key
+            const copyText =
+              values && !invalid
+                ? `${formatByteValue(values[0])} ${unit.sym}（二进制 ${BASES[0].base}）／ ${formatByteValue(values[1])} ${unit.sym}（十进制 ${BASES[1].base}）`
+                : ''
             return (
-              <article key={unit.key} className={s.card} data-source={isSource}>
-                <header className={s['card-head']}>
+              <article key={unit.key} className={s.row} data-source={isSource}>
+                <div className={s['row-id']}>
                   <span className={s.sym}>{unit.sym}</span>
                   <span className={s.name}>{unit.name}</span>
-                  {isSource && <span className={s.badge}>输入单位</span>}
-                </header>
-                {BASES.map((base, index) => {
-                  const text = values ? formatByteValue(values[index]) : '—'
-                  return (
-                    <div key={base.key} className={s.row}>
-                      <span className={s.base}>{base.short}</span>
-                      <code className={s.num}>{text}</code>
-                      <CopyButton
-                        value={text === '—' ? '' : `${text} ${unit.sym}`}
-                        iconOnly
-                        size="sm"
-                        variant="ghost"
-                        label={`复制 ${unit.name}（${base.label}）`}
-                        successMessage={`${text} ${unit.sym} 已复制`}
-                      />
-                    </div>
-                  )
-                })}
+                  {isSource && <span className={s.tag}>输入单位</span>}
+                </div>
+                <code className={s['val-num']}>{values ? formatByteValue(values[0]) : '—'}</code>
+                <code className={s['val-num']}>{values ? formatByteValue(values[1]) : '—'}</code>
+                <CopyButton
+                  className={s['row-copy']}
+                  value={copyText}
+                  iconOnly
+                  size="sm"
+                  variant="ghost"
+                  label={`复制 ${unit.name} 换算结果`}
+                  successMessage={`${unit.name} 结果已复制`}
+                />
               </article>
             )
           })}

@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Heart } from 'lucide-react'
 import { useFavorites } from '@/app/contexts'
-import { categoryLabel } from '@/registry/categories'
 import type { ToolDefinition } from '@/types/tool'
 import s from './ToolLayout.module.css'
 
@@ -36,7 +35,6 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
       <div className={s.titles}>
         <div className={s['title-group']}>
           <h1 className={s.title}>{tool.name}</h1>
-          <span className={s.tag}>{categoryLabel(tool.category)}</span>
         </div>
         <p className={s.desc}>{tool.description}</p>
       </div>

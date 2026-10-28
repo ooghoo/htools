@@ -23,7 +23,7 @@
 }
 
 .title {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: var(--weight-medium);
   letter-spacing: -0.02em;
   line-height: 1.3;
@@ -266,7 +266,7 @@
   }
 
   .title {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
   }
 
   .head-tools {

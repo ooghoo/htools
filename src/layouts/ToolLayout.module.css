@@ -50,18 +50,10 @@
 }
 
 .title {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: var(--weight-medium);
   letter-spacing: -0.02em;
   line-height: 1.25;
-}
-
-.tag {
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  background: var(--muted);
-  color: var(--muted-foreground);
-  font-size: var(--text-xs);
 }
 
 .desc {
@@ -149,7 +141,7 @@
   }
 
   .title {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
   }
 
   .fav span {
