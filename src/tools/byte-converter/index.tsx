@@ -38,8 +38,8 @@ export default function ByteConverter() {
   const visibleUnits = expanded ? BYTE_UNITS : BYTE_UNITS.slice(0, DEFAULT_VISIBLE)
 
   return (
-    <>
-      <Card>
+    <div className={s.tool}>
+      <Card className={s.panel}>
         <div className={s['input-row']}>
           <Field
             label="数值"
@@ -82,12 +82,11 @@ export default function ByteConverter() {
         </div>
       </Card>
 
-      <section className={s.section} aria-label="换算结果">
-        <div className={s['section-head']}>
-          <h2 className={s['section-title']}>
-            换算结果
-            <span className={s['section-hint']}>每格上排 1024 进制，下排 1000 进制</span>
-          </h2>
+      <section className={s.results} aria-label="换算结果">
+        <div className={s['results-bar']}>
+          <p className={s['results-meta']}>
+            共 {BYTE_UNITS.length} 种单位 · 上排 <b>1024</b> 进制，下排 <b>1000</b> 进制
+          </p>
           <Button
             variant="ghost"
             size="sm"
@@ -120,7 +119,7 @@ export default function ByteConverter() {
                         iconOnly
                         size="sm"
                         variant="ghost"
-                        label={`复制 ${unit.name} 结果`}
+                        label={`复制 ${unit.name}（${base.label}）`}
                         successMessage={`${text} ${unit.sym} 已复制`}
                       />
                     </div>
@@ -131,6 +130,6 @@ export default function ByteConverter() {
           })}
         </div>
       </section>
-    </>
+    </div>
   )
 }

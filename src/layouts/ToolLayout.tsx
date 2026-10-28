@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Heart } from 'lucide-react'
 import { useFavorites } from '@/app/contexts'
-import { ToolIcon } from '@/components/ToolIcon'
 import { categoryLabel } from '@/registry/categories'
 import type { ToolDefinition } from '@/types/tool'
 import s from './ToolLayout.module.css'
@@ -34,10 +33,8 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
         <ArrowLeft aria-hidden="true" />
       </Link>
 
-      <ToolIcon icon={tool.icon} accent={tool.accent} size="lg" />
-
       <div className={s.titles}>
-        <div className={s['title-row']}>
+        <div className={s['title-group']}>
           <h1 className={s.title}>{tool.name}</h1>
           <span className={s.tag}>{categoryLabel(tool.category)}</span>
         </div>

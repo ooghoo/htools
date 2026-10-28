@@ -35,17 +35,18 @@
 
 .titles {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: var(--space-3);
   min-width: 0;
   flex: 1;
+  flex-wrap: wrap;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
+.title-group {
+  display: inline-flex;
+  align-items: baseline;
   gap: var(--space-2);
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .title {
@@ -66,7 +67,8 @@
 .desc {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-normal);
+  min-width: 0;
 }
 
 .fav {

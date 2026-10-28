@@ -54,7 +54,7 @@
   --sidebar-accent-foreground: hsl(240 13.95% 16.86%);
 
   /* ---------- 页面级私有令牌 ---------- */
-  --t-fav: hsl(348 88% 58%);
+  --t-fav: hsl(211 100% 45%);
   --t-scrollbar: hsl(240 1.1% 64.31% / 0.42);
 
   /* ---------- 字体 ---------- */
@@ -164,7 +164,7 @@ html[data-theme='dark'] {
   --sidebar-accent: hsl(0 0% 14.9%);
   --sidebar-accent-foreground: hsl(0 0% 98.04%);
 
-  --t-fav: hsl(348 90% 68%);
+  --t-fav: hsl(211 100% 70%);
   --t-scrollbar: hsl(240 0.83% 52.55% / 0.5);
 
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);

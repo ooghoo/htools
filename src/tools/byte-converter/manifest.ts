@@ -4,8 +4,7 @@ import type { ToolMeta } from '@/types/tool'
 export const manifest: ToolMeta = {
   id: 'byte-converter',
   name: '字节换算',
-  description:
-    '二进制（1024）：Windows 内存与文件系统的算法 · 十进制（1000）：macOS 与硬盘厂商的算法 · 1 Byte = 8 bit',
+  description: 'Windows：二进制 1024 · macOS：十进制 1000',
   category: 'convert',
   icon: Database,
   accent: '#0071e3',

@@ -68,6 +68,7 @@
   gap: var(--space-6);
   width: 100%;
   max-width: var(--content-max);
+  min-height: 100%;
   margin: 0 auto;
   padding: var(--space-6) 24px var(--space-10);
 }
