@@ -41,37 +41,39 @@ export default function ByteConverter() {
       {/* 输入区：单一干净的面板，作为整页视觉重心 */}
       <section className={s.panel} aria-label="输入">
         <div className={s['input-row']}>
-          <Field
-            className={s['field-amount']}
-            label="数值"
-            htmlFor="amount-input"
-            error={invalid ? '请输入数字，支持小数与科学计数法（如 1.5e3）。' : undefined}
-          >
-            <Input
-              id="amount-input"
-              size="lg"
-              mono
-              inputMode="decimal"
-              value={amount}
-              invalid={invalid}
-              placeholder="1"
-              autoComplete="off"
-              onChange={(event) => setAmount(event.target.value)}
-            />
-          </Field>
-          <Field className={s['field-unit']} label="单位" htmlFor="unit-select">
-            <Select
-              id="unit-select"
-              size="lg"
-              value={unitKey}
-              options={UNIT_OPTIONS}
-              onChange={setUnitKey}
-              aria-label="输入单位"
-            />
-          </Field>
+          <div className={s.amount}>
+            <Field
+              className={s['field-amount']}
+              label="数值"
+              htmlFor="amount-input"
+              error={invalid ? '请输入数字，支持小数与科学计数法（如 1.5e3）。' : undefined}
+            >
+              <Input
+                id="amount-input"
+                size="lg"
+                mono
+                inputMode="decimal"
+                value={amount}
+                invalid={invalid}
+                placeholder="1"
+                autoComplete="off"
+                onChange={(event) => setAmount(event.target.value)}
+              />
+            </Field>
+            <Field className={s['field-unit']} label="单位" htmlFor="unit-select">
+              <Select
+                id="unit-select"
+                size="lg"
+                value={unitKey}
+                options={UNIT_OPTIONS}
+                onChange={setUnitKey}
+                aria-label="输入单位"
+              />
+            </Field>
+          </div>
           <Button
             className={s['reset-btn']}
-            variant="ghost"
+            variant="secondary"
             icon={RotateCcw}
             onClick={() => {
               setAmount('1')

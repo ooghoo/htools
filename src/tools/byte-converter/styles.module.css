@@ -18,7 +18,16 @@
 .input-row {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-3);
+  gap: var(--space-4);
+}
+
+.amount {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  max-width: 480px;
 }
 
 .field-amount {
@@ -27,14 +36,15 @@
 }
 
 .field-unit {
-  width: 176px;
+  width: 140px;
   flex-shrink: 0;
 }
 
 .reset-btn {
   flex-shrink: 0;
-  height: var(--control-h);
-  border-radius: var(--radius);
+  margin-left: auto;
+  height: 46px;
+  border-radius: var(--radius-card);
 }
 
 /* ---------- 结果区 ---------- */
@@ -189,6 +199,12 @@
 
   .input-row {
     flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .amount {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
   }
 
   .field-amount {
@@ -201,7 +217,9 @@
   }
 
   .reset-btn {
-    flex: 0 0 auto;
+    flex: 1 1 100%;
+    width: 100%;
+    justify-content: center;
   }
 
   .list-head {
