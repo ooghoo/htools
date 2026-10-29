@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
-import { useToast } from '@/app/contexts'
 import { Button } from '@/components/ui/Button'
 import { CopyButton } from '@/components/ui/CopyButton'
 import { Segmented } from '@/components/ui/Segmented'
-import { copyText } from '@/utils/clipboard'
 import { formatNumber } from '@/utils/format'
 import { manifest } from './manifest'
 import {
@@ -29,8 +27,6 @@ const DECIMAL_VALUE_OPTIONS = DECIMAL_OPTIONS.map((option) => ({
 }))
 
 export default function ByteConverter() {
-  const { notify } = useToast()
-
   const [amount, setAmount] = useState('1')
   const [unitKey, setUnitKey] = useState('B')
   const [decimals, setDecimals] = useState<Decimals>(2)
@@ -68,11 +64,6 @@ export default function ByteConverter() {
     setUnitKey(entry.unitKey)
   }
 
-  async function copy(text: string, label: string) {
-    const ok = await copyText(text)
-    notify(ok ? `${label} 已复制` : '复制失败，请手动选中后复制', ok ? 'success' : 'error')
-  }
-
   return (
     <div className={s.root}>
       {/* ---------- 标题区：标题 + 进制说明 + 小数位 ---------- */}
@@ -96,11 +87,11 @@ export default function ByteConverter() {
 
       {/* ---------- 输入区 ---------- */}
       <section className={s.inputCard} aria-label="输入">
-        <div className={s.inputMain}>
-          <label className={s.eyebrow} htmlFor="amount-input">
-            输入数值 / VALUE
-          </label>
+        <label className={s.eyebrow} htmlFor="amount-input">
+          输入数值 / VALUE
+        </label>
 
+        <div className={s.fieldRow}>
           <div className={s.field} data-invalid={invalid}>
             <input
               id="amount-input"
@@ -137,55 +128,55 @@ export default function ByteConverter() {
             </div>
           </div>
 
-          {/* 校验失败时占用历史那一行，卡片高度不跳 */}
-          {invalid ? (
-            <p className={s.error} role="alert">
-              请输入数字，支持小数与科学计数法（如 1.5e3）
-            </p>
-          ) : (
-            history.length > 0 && (
-              <div className={s.history}>
-                <span className={s.historyLabel}>历史</span>
-                {history.map((entry) => (
-                  <button
-                    key={entry.key}
-                    type="button"
-                    className={s.historyChip}
-                    onClick={() => applyHistory(entry)}
-                  >
-                    {entry.label}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className={s.historyClear}
-                  onClick={() => setHistory([])}
-                >
-                  清除
-                </button>
-              </div>
-            )
-          )}
+          <Button
+            className={s.reset}
+            variant="primary"
+            icon={RotateCcw}
+            onClick={() => {
+              setAmount('1')
+              setUnitKey('B')
+            }}
+          >
+            重置
+          </Button>
         </div>
 
-        <Button
-          className={s.reset}
-          variant="primary"
-          icon={RotateCcw}
-          onClick={() => {
-            setAmount('1')
-            setUnitKey('B')
-          }}
-        >
-          重置
-        </Button>
+        {/* 校验失败时占用历史那一行，卡片高度不跳 */}
+        {invalid ? (
+          <p className={s.error} role="alert">
+            请输入数字，支持小数与科学计数法（如 1.5e3）
+          </p>
+        ) : (
+          history.length > 0 && (
+            <div className={s.history}>
+              <span className={s.historyLabel}>历史</span>
+              {history.map((entry) => (
+                <button
+                  key={entry.key}
+                  type="button"
+                  className={s.historyChip}
+                  onClick={() => applyHistory(entry)}
+                >
+                  {entry.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={s.historyClear}
+                onClick={() => setHistory([])}
+              >
+                清除
+              </button>
+            </div>
+          )
+        )}
       </section>
 
       {/* ---------- 结果 + 右栏说明 ---------- */}
       <div className={s.resultsRow}>
         <section className={s.table} aria-label="换算结果">
           <header className={s.tableHead}>
-            <h2 className={s.eyebrow}>换算结果</h2>
+            <h2 className={`${s.eyebrow} ${s.headLabel}`}>换算结果</h2>
             <span className={s.countBadge}>{BYTE_UNITS.length} 单位</span>
             <button
               type="button"
@@ -214,10 +205,6 @@ export default function ByteConverter() {
               const binary = values ? formatByteValue(values[0], decimals) : '—'
               const decimal = values ? formatByteValue(values[1], decimals) : '—'
               const isSource = unit.key === fromUnit.key
-              const combined =
-                values === undefined
-                  ? ''
-                  : `${binary} ${unit.sym}（1024）／ ${decimal} ${unit.sym}（1000）`
 
               return (
                 <div key={unit.key} className={`${s.gridRow} ${s.row}`} data-active={isSource}>
@@ -229,35 +216,33 @@ export default function ByteConverter() {
                     {isSource && <span className={s.badge}>输入单位</span>}
                   </div>
 
-                  <button
-                    type="button"
-                    className={s.val}
-                    title={`点击复制 ${binary} ${unit.sym}（1024）`}
-                    onClick={() => copy(`${binary} ${unit.sym}`, `${unit.sym} 二进制值`)}
-                  >
+                  <div className={s.val}>
                     <span className={s.colHint}>1024</span>
                     <span className={s.valNum}>{binary}</span>
-                  </button>
+                    <CopyButton
+                      className={s.copyBtn}
+                      value={values ? `${binary} ${unit.sym}` : ''}
+                      iconOnly
+                      size="sm"
+                      variant="ghost"
+                      label={`复制 ${unit.sym} 二进制值`}
+                      successMessage={`${binary} ${unit.sym} 已复制`}
+                    />
+                  </div>
 
-                  <button
-                    type="button"
-                    className={`${s.val} ${s.valDim}`}
-                    title={`点击复制 ${decimal} ${unit.sym}（1000）`}
-                    onClick={() => copy(`${decimal} ${unit.sym}`, `${unit.sym} 十进制值`)}
-                  >
+                  <div className={`${s.val} ${s.valDim}`}>
                     <span className={s.colHint}>1000</span>
                     <span className={s.valNum}>{decimal}</span>
-                  </button>
-
-                  <CopyButton
-                    className={s.rowCopy}
-                    value={combined}
-                    iconOnly
-                    size="sm"
-                    variant="ghost"
-                    label={`复制 ${unit.name} 结果`}
-                    successMessage={`${unit.name} 结果已复制`}
-                  />
+                    <CopyButton
+                      className={s.copyBtn}
+                      value={values ? `${decimal} ${unit.sym}` : ''}
+                      iconOnly
+                      size="sm"
+                      variant="ghost"
+                      label={`复制 ${unit.sym} 十进制值`}
+                      successMessage={`${decimal} ${unit.sym} 已复制`}
+                    />
+                  </div>
                 </div>
               )
             })}
@@ -267,7 +252,7 @@ export default function ByteConverter() {
         <aside className={s.rail}>
           <section className={`${s.card} ${s.noteCard}`}>
             <header className={s.cardHead}>
-              <h2 className={s.eyebrow}>换算说明</h2>
+              <h2 className={`${s.eyebrow} ${s.headLabel}`}>换算说明</h2>
               <button
                 type="button"
                 className={s.collapse}
@@ -320,7 +305,7 @@ export default function ByteConverter() {
 
           <section className={s.card}>
             <header className={s.cardHead}>
-              <h2 className={s.eyebrow}>常用对照</h2>
+              <h2 className={`${s.eyebrow} ${s.headLabel}`}>常用对照</h2>
               <span className={s.iec}>IEC</span>
             </header>
             <div className={s.refRows}>

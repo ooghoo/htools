@@ -28,8 +28,10 @@ export interface ToolMeta {
   /** 唯一 ID，同时作为路由参数：/tools/:id —— 发布后不要再改 */
   id: string
   name: string
-  /** 一句话描述，建议 24 字以内，首页卡片与工具页副标题共用 */
+  /** 一句话描述，建议 24 字以内，用于首页卡片 */
   description: string
+  /** 工具页标题下方的说明；不填则复用 description */
+  pageDescription?: string
   category: ToolCategoryId
   /** 图标组件，统一来自 lucide-react */
   icon: LucideIcon

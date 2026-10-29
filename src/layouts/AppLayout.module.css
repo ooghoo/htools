@@ -70,7 +70,16 @@
   max-width: var(--content-max);
   min-height: 100%;
   margin: 0 auto;
-  padding: var(--space-6) 24px var(--space-10);
+  padding: 20px 24px var(--space-10);
+}
+
+/*
+ * 工具自己声明 data-fill="true" 时，页面高度锁定到可视区：
+ * 内容不再把整页撑高，改由工具内部的滚动区自己滚。
+ */
+.page:has([data-fill='true']) {
+  height: 100%;
+  padding-bottom: 20px;
 }
 
 .backdrop {

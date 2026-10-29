@@ -127,7 +127,8 @@ import type { ToolMeta } from '@/types/tool'
 export const manifest: ToolMeta = {
   id: 'my-tool',                 // 唯一 ID，同时是路由参数，发布后别再改
   name: '我的工具',
-  description: '一句话说明，24 字以内，卡片和工具页共用',
+  description: '一句话说明，24 字以内，用于首页卡片',
+  pageDescription: '工具页副标题，不填则复用 description',
   category: 'text',              // convert | text | image
   icon: Wand,                    // 统一用 lucide-react
   accent: '#10b981',             // 图标底色
@@ -139,9 +140,9 @@ export const manifest: ToolMeta = {
 ```
 
 > **页面顶部结构**：面包屑条（首页 / 工具名 + 收藏）由 `ToolLayout` 统一渲染，固定不滚动；
-> 下面的标题区默认也由平台渲染（名称 + 描述）。如果工具需要在标题右边放自己的控件
-> （例如字节换算页的「小数位」），把 `customHeader` 设为 `true`，然后在工具里自己写
-> `<h1>` + 说明文字，参考 `src/tools/byte-converter/index.tsx`。
+> 下面的标题区默认也由平台渲染（名称 + `pageDescription ?? description`）。如果工具需要在标题
+> 右边放自己的控件（例如字节换算页的「小数位」），把 `customHeader` 设为 `true`，然后在工具里
+> 自己写 `<h1>` + 说明文字，参考 `src/tools/byte-converter/index.tsx`。
 
 **3. 写组件 `index.tsx`（default export，不接收 props）**
 
@@ -166,6 +167,20 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 ```
 
 保存后：首页自动出现（按分类归组、参与搜索）、`/#/tools/my-tool` 自动可用、侧栏计数自动更新。不需要改路由、不需要改首页。
+
+### 满高工具（画布类）
+
+默认页面随内容长高、由外层容器滚动。像水印这种「画布 + 参数面板」的工具需要固定占满可视区，
+在工具的根元素上加 `data-fill="true"` 即可：
+
+```tsx
+<div className={s.app} data-fill="true">…</div>
+```
+
+`AppLayout` 会用 `.page:has([data-fill='true'])` 把页面高度锁到 100%，工具内部再用
+`flex: 1; min-height: 0` 分配剩余空间。**内部滚动区必须加 `overscroll-behavior: contain`**，
+否则滚到底后滚动会链式传给外层容器（scroll chaining，就是「滑到底页面跟着动」的那个问题）。
+窄屏下建议关掉满高，回到自然文档流。
 
 ### 模块隔离
 

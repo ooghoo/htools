@@ -278,7 +278,7 @@ export default function WatermarkTool() {
 
   return (
     <>
-      <div className={s.app}>
+      <div className={s.app} data-fill="true">
         <section className={s.stage}>
           <div
             ref={stageRef}
@@ -682,12 +682,6 @@ export default function WatermarkTool() {
                     onChange={(quality) => setOut((current) => ({ ...current, quality }))}
                   />
                 )}
-
-                <p className={s.footnote}>
-                  全部处理都在浏览器本地完成
-                  <br />
-                  图片不会上传到任何服务器
-                </p>
               </>
             )}
           </div>

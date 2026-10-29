@@ -5,6 +5,8 @@ export const manifest: ToolMeta = {
   id: 'watermark',
   name: '图片水印',
   description: '批量加水印，本地 Canvas 处理，导出按像素缩放',
+  // 工具页副标题用隐私说明，首页卡片仍用上面那句功能描述
+  pageDescription: '全部处理都在浏览器本地完成，图片不会上传到任何服务器',
   category: 'image',
   icon: Image,
   accent: '#5e5ce6',

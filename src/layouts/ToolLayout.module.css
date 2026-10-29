@@ -116,6 +116,7 @@
   gap: 14px;
   flex-wrap: wrap;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .page-title {
@@ -138,7 +139,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  flex: 1;
   min-width: 0;
+  /* 内容比可视区矮时撑满，工具内部才能用 flex:1 做「占满容器」的布局 */
+  min-height: 0;
   animation: fade-rise var(--duration-base) var(--ease-out);
 }
 

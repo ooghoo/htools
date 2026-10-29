@@ -220,6 +220,12 @@
   background: var(--muted);
 }
 
+/* Field 是 column flex，默认会把子元素拉伸成整行；
+   分段控件要保持内容宽度，否则背景轨道会拖出一条空槽 */
+.field > .seg {
+  align-self: flex-start;
+}
+
 .seg-btn {
   height: 28px;
   padding: 0 10px;

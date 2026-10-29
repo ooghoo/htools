@@ -63,7 +63,7 @@ export function ToolLayout({ tool, children }: ToolLayoutProps) {
         {!tool.customHeader && (
           <header className={s['page-head']}>
             <h1 className={s['page-title']}>{tool.name}</h1>
-            <p className={s['page-desc']}>{tool.description}</p>
+            <p className={s['page-desc']}>{tool.pageDescription ?? tool.description}</p>
           </header>
         )}
         {children}

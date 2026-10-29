@@ -7,7 +7,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin: calc(-1 * var(--space-6)) -24px 0;
+  margin: -20px -24px 0;
   padding: 12px 24px;
   background: var(--background-95);
   -webkit-backdrop-filter: saturate(180%) blur(16px);

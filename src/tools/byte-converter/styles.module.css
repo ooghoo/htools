@@ -62,19 +62,18 @@
    ============================================================ */
 .inputCard {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-direction: column;
+  gap: 8px;
   padding: 15px;
   background: var(--muted);
   border-radius: var(--radius-card);
 }
 
-.inputMain {
-  flex: 1;
-  min-width: 0;
+/* 输入框与重置按钮同一行、同高，保证上下对齐 */
+.fieldRow {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: var(--space-4);
 }
 
 /* 微标签：等宽大写风格的小标题 */
@@ -87,7 +86,16 @@
   white-space: nowrap;
 }
 
+/* 卡片与表格的小标题：比输入区微标签大一档 */
+.headLabel {
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
 .field {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   height: 44px;
@@ -235,7 +243,7 @@
 
 .reset {
   flex-shrink: 0;
-  height: 40px;
+  height: 44px;
   padding: 0 20px;
   border-radius: 9px;
   font-size: 10.5px;
@@ -263,14 +271,15 @@
 
 .tableHead {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  height: 49px;
-  padding: 0 15px;
+  min-height: 49px;
+  padding: 14px 15px 12px;
   border-bottom: 1px solid var(--line);
 }
 
 .countBadge {
+  margin-top: 1px;
   padding: 2px 6px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -286,8 +295,9 @@
   align-items: center;
   gap: 5px;
   margin-left: auto;
-  padding: 4px 2px;
+  padding: 0;
   font-size: 10px;
+  line-height: 16px;
   letter-spacing: 0.5px;
   color: var(--muted-foreground);
   transition: color var(--duration-fast) ease;
@@ -305,7 +315,7 @@
 /* 列网格：单位 / 1024 / 1000 / 复制 */
 .gridRow {
   display: grid;
-  grid-template-columns: minmax(0, 307fr) minmax(0, 227fr) minmax(0, 227fr) 26px;
+  grid-template-columns: minmax(0, 307fr) minmax(0, 227fr) minmax(0, 227fr);
   align-items: center;
   padding: 0 15px;
 }
@@ -374,7 +384,9 @@
 }
 
 .sym {
+  font-family: var(--font-mono);
   font-size: 12.5px;
+  font-weight: var(--weight-bold);
   line-height: 18px;
   letter-spacing: -0.2px;
   color: var(--foreground);
@@ -404,15 +416,13 @@
   white-space: nowrap;
 }
 
-/* 数值单元格本身就是复制按钮，hover 时给一点反馈 */
+/* 数值 + 悬停出现的复制按钮，放在数字右边紧挨着 */
 .val {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
-  padding: 0;
-  text-align: left;
-  cursor: copy;
+  padding-right: 8px;
 }
 
 .valNum {
@@ -424,11 +434,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.val:hover .valNum {
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
 }
 
 .valDim .valNum {
@@ -443,20 +448,31 @@
   color: var(--muted-foreground);
 }
 
-.rowCopy {
-  justify-self: end;
+.copyBtn {
+  flex-shrink: 0;
   opacity: 0;
   transition: opacity var(--duration-fast) ease;
 }
 
-.row:hover .rowCopy,
-.row[data-active='true'] .rowCopy,
-.rowCopy:focus-visible {
+/* 比 Button 自带的 .icon.sm（30px）更具体，才能把点击区收到 20px */
+.row .val .copyBtn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+
+.row .val .copyBtn svg {
+  width: 11px;
+  height: 11px;
+}
+
+.row:hover .copyBtn,
+.copyBtn:focus-visible {
   opacity: 1;
 }
 
 @media (hover: none) {
-  .rowCopy {
+  .copyBtn {
     opacity: 1;
   }
 }
@@ -480,16 +496,17 @@
 
 .cardHead {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  height: 41px;
-  padding: 0 16px;
+  min-height: 41px;
+  padding: 14px 16px 10px;
   border-bottom: 1px solid var(--line);
 }
 
+/* 说明卡头没有分隔线，和下方标题连成一段 */
 .noteCard .cardHead {
-  height: 34px;
-  padding-bottom: 4px;
+  min-height: 0;
+  padding-bottom: 0;
   border-bottom: none;
 }
 
@@ -499,6 +516,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
+  margin-top: -3px;
   margin-left: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -659,19 +677,21 @@
 }
 
 @media (max-width: 680px) {
-  .inputCard {
+  /* 窄屏：输入与重置拆两行，表格重排为「单位 + 两列数值」 */
+  .fieldRow {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 8px;
   }
 
   .reset {
-    align-self: flex-start;
+    width: 100%;
+    justify-content: center;
   }
 
   .gridRow {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 26px;
-    row-gap: 4px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 6px;
     padding: 10px 12px;
   }
 
@@ -684,22 +704,23 @@
     padding-right: 0;
   }
 
-  .rowCopy {
-    align-self: end;
-  }
-
   .colHint {
     display: block;
+    width: 100%;
   }
 
   .val {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
+    flex-wrap: wrap;
+    row-gap: 2px;
+    padding-right: 0;
   }
 
   .valNum {
     font-size: 13px;
+  }
+
+  .copyBtn {
+    opacity: 1;
   }
 
   .tableHead {
