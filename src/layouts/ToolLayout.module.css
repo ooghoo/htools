@@ -1,90 +1,95 @@
+/* ============================================================
+   工具页 · 顶部面包屑条
+   固定在内容面板顶部，与下方滚动区不在同一层
+   ============================================================ */
 .head {
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
+  height: 54px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
+  padding: 0 24px;
   min-width: 0;
-  padding: var(--space-4) 24px;
 }
 
-.back {
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.crumb-home {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
+  gap: 7px;
   flex-shrink: 0;
-  border-radius: var(--radius-sm);
   color: var(--muted-foreground);
-  transition:
-    background-color var(--duration-fast) ease,
-    color var(--duration-fast) ease;
+  transition: color var(--duration-fast) ease;
 }
 
-.back:hover {
-  background: var(--muted);
+.crumb-home:hover {
   color: var(--foreground);
 }
 
-.back svg {
-  width: 16px;
-  height: 16px;
+.crumb-icon {
+  width: 12px;
+  height: 12px;
 }
 
-.titles {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
+.crumb-text {
+  font-size: 10.5px;
+  letter-spacing: 0.69px;
+  line-height: 15px;
+}
+
+.crumb-sep {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  line-height: 13px;
+  letter-spacing: 1.37px;
+  color: var(--border);
+}
+
+.crumb-current {
   min-width: 0;
-  flex: 1;
-  flex-wrap: wrap;
+  font-size: 10.5px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.69px;
+  line-height: 15px;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.title-group {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-medium);
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-}
-
-.desc {
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
-  line-height: var(--leading-normal);
-  min-width: 0;
-}
-
+/* 收藏：面包屑条右侧的小胶囊 */
 .fav {
-  margin-left: auto;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: var(--control-h-sm);
-  padding: 0 10px;
+  gap: 7px;
+  height: 28px;
+  padding: 0 11px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 7px;
   background: var(--card);
-  font-size: var(--text-sm);
   color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.43px;
   transition:
+    background-color var(--duration-fast) ease,
     border-color var(--duration-fast) ease,
-    color var(--duration-fast) ease,
-    background-color var(--duration-fast) ease;
+    color var(--duration-fast) ease;
 }
 
 .fav svg {
-  width: 14px;
-  height: 14px;
+  width: 11px;
+  height: 11px;
 }
 
 .fav:hover {
@@ -93,13 +98,40 @@
 }
 
 .fav[data-on='true'] {
-  color: var(--t-fav);
-  border-color: color-mix(in srgb, var(--t-fav) 35%, var(--border));
-  background: color-mix(in srgb, var(--t-fav) 7%, var(--card));
+  background: var(--brand-1);
+  border-color: var(--brand-2);
+  color: var(--brand-foreground);
 }
 
 .fav[data-on='true'] svg {
-  fill: var(--t-fav);
+  fill: var(--brand-foreground);
+}
+
+/* ============================================================
+   页面标题区：平台默认渲染，工具声明 customHeader 时由工具自己画
+   ============================================================ */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.page-desc {
+  font-size: 11.5px;
+  letter-spacing: 0.12px;
+  line-height: 16px;
+  color: var(--muted-foreground);
+  min-width: 0;
 }
 
 .body {
@@ -137,11 +169,7 @@
 
 @media (max-width: 640px) {
   .head {
-    padding: var(--space-3) var(--space-4);
-  }
-
-  .title {
-    font-size: var(--text-lg);
+    padding: 0 var(--space-4);
   }
 
   .fav span {
@@ -149,7 +177,7 @@
   }
 
   .fav {
-    width: var(--control-h-sm);
+    width: 28px;
     padding: 0;
     justify-content: center;
   }

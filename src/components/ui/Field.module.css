@@ -461,3 +461,25 @@
   border: none;
   border-radius: 3px;
 }
+
+/* 紧凑版分段切换：用于页面头部的轻量档位（小数位等） */
+.seg-compact {
+  padding: 2px;
+  gap: 2px;
+  border-radius: 7px;
+}
+
+.seg-compact .seg-btn {
+  height: 22px;
+  min-width: 27px;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: var(--weight-normal);
+  letter-spacing: 0.95px;
+}
+
+.seg-compact .seg-btn[aria-pressed='true'] {
+  font-weight: var(--weight-semibold);
+}

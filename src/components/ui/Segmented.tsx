@@ -12,6 +12,8 @@ export interface SegmentedProps<T extends string> {
   onChange: (value: T) => void
   /** 组的可访问名称，例如「时间单位」 */
   ariaLabel: string
+  /** md：默认 28px；compact：22px，用于页面头部的轻量切换 */
+  size?: 'md' | 'compact'
   className?: string
 }
 
@@ -21,10 +23,15 @@ export function Segmented<T extends string>({
   options,
   onChange,
   ariaLabel,
+  size = 'md',
   className,
 }: SegmentedProps<T>) {
   return (
-    <div className={cx(s.seg, className)} role="group" aria-label={ariaLabel}>
+    <div
+      className={cx(s.seg, size === 'compact' && s['seg-compact'], className)}
+      role="group"
+      aria-label={ariaLabel}
+    >
       {options.map((option) => (
         <button
           key={option.value}

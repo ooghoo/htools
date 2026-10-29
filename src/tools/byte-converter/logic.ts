@@ -33,8 +33,17 @@ export const BASES: BaseDef[] = [
   { key: 'decimal', label: '十进制 · 1000', short: '1000', base: 1000 },
 ]
 
-/** 默认展开到 EB，更大的单位（ZB / YB）折叠起来 */
-export const DEFAULT_VISIBLE = 8
+/** 默认展示到 PB，更大的单位（EB / ZB / YB）折叠在「展开全部」里 */
+export const DEFAULT_VISIBLE = 7
+
+/** 小数位档位：设计稿里的 2 / 4 / 6 */
+export type Decimals = 2 | 4 | 6
+
+export const DECIMAL_OPTIONS: { value: Decimals; label: string }[] = [
+  { value: 2, label: '2' },
+  { value: 4, label: '4' },
+  { value: 6, label: '6' },
+]
 
 export function factorOf(unit: ByteUnit, base: number): number {
   // 1 Byte = 8 bit
@@ -59,20 +68,24 @@ export function convertAll(value: number, fromUnit: ByteUnit): Record<string, nu
   return result
 }
 
-/** 统一数字格式：2 位小数；小于 0.005 或大于 1e15 时改用科学计数法，避免被显示成 0.00 */
-export function formatByteValue(value: number): string {
-  if (value === 0) return '0.00'
+/**
+ * 统一数字格式。
+ * - 按所选小数位补零，整数部分带千分位；
+ * - 小到四舍五入会变成 0.00… 的数值改用科学计数法，信息不丢；极大值同理。
+ */
+export function formatByteValue(value: number, decimals: Decimals = 2): string {
+  if (value === 0) return (0).toFixed(decimals)
   if (!Number.isFinite(value)) return '—'
 
   const abs = Math.abs(value)
-  // 阈值取 0.005：再小的话四舍五入到两位小数就成了 0.00，信息全丢
-  if (abs < 0.005 || abs >= 1e15) {
-    return value.toExponential(2).replace('e+', 'e')
+  const halfUnit = Math.pow(10, -decimals) / 2
+  if (abs < halfUnit || abs >= 1e15) {
+    return value.toExponential(decimals).replace('e+', 'e')
   }
 
   return value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   })
 }
 
@@ -83,3 +96,43 @@ export function parseAmount(input: string): number | null {
   const value = Number(raw)
   return Number.isFinite(value) ? value : null
 }
+
+/* ---------------- 历史记录（仅当前会话，不落盘） ---------------- */
+
+export interface HistoryEntry {
+  /** 唯一键，用于 React key 与去重 */
+  key: string
+  /** 回填到输入框的原始数值字符串 */
+  value: string
+  unitKey: string
+  /** 芯片上显示的文案 */
+  label: string
+}
+
+/** 首次进入时的示例，用户一旦换算就会被真实历史替换 */
+export const DEFAULT_HISTORY: HistoryEntry[] = [
+  { key: '1 KB', value: '1', unitKey: 'KB', label: '1 KB' },
+  { key: '1 MB', value: '1', unitKey: 'MB', label: '1 MB' },
+  { key: '1 GB', value: '1', unitKey: 'GB', label: '1 GB' },
+  { key: '1024 B', value: '1024', unitKey: 'B', label: '1024 B' },
+]
+
+export const HISTORY_LIMIT = 4
+
+/** 把一次输入并入历史：去重、置顶、限长 */
+export function pushHistory(list: HistoryEntry[], entry: HistoryEntry): HistoryEntry[] {
+  const rest = list.filter((item) => item.key !== entry.key)
+  return [entry, ...rest].slice(0, HISTORY_LIMIT)
+}
+
+/* ---------------- 右侧说明栏 ---------------- */
+
+/** 常用对照：二进制下 1 KB / 1 MB / 1 GB 到底是多少字节 */
+export const QUICK_REFERENCE = [
+  { from: '1 KB', bytes: 1024 },
+  { from: '1 MB', bytes: 1024 ** 2 },
+  { from: '1 GB', bytes: 1024 ** 3 },
+]
+
+/** 十进制 1000 相对二进制 1024 的占比，用于说明卡里的对比条 */
+export const DECIMAL_RATIO = 1000 / 1024

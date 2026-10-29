@@ -10,4 +10,6 @@ export const manifest: ToolMeta = {
   accent: '#0071e3',
   keywords: ['byte', 'kb', 'mb', 'gb', '字节', '流量', '存储', '容量', '换算', '单位'],
   order: 12,
+  // 标题行右侧要放「小数位」控件，标题区由工具自己渲染
+  customHeader: true,
 }

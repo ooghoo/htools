@@ -41,6 +41,12 @@ export interface ToolMeta {
   order?: number
   /** 是否启用，false 时不展示、路由直接 404；默认 true */
   enabled?: boolean
+  /**
+   * 工具自己渲染页面标题区（H1 + 副标题）。
+   * 面包屑始终由平台渲染；置为 true 时平台不再渲染默认的名称/描述块，
+   * 适合标题旁边还要放页面级控件的工具。
+   */
+  customHeader?: boolean
 }
 
 /** 注册表里的完整条目：元数据 + 懒加载的组件 */

@@ -50,7 +50,7 @@ htools/
 │   ├── hooks/useMediaQuery.ts
 │   ├── layouts/
 │   │   ├── AppLayout.tsx          # 外壳：顶栏 + 侧栏 + 内容面板
-│   │   └── ToolLayout.tsx         # 工具页框架：返回 / 标题 / 描述 / 收藏
+│   │   └── ToolLayout.tsx         # 工具页框架：面包屑 / 标题 / 收藏
 │   ├── pages/
 │   │   ├── HomePage.tsx           # 首页：分类分组 + 搜索 + 收藏 + 最近使用
 │   │   ├── ToolPage.tsx           # /tools/:toolId
@@ -134,8 +134,14 @@ export const manifest: ToolMeta = {
   keywords: ['my', 'tool', '别名', '关键词'],  // 参与搜索
   order: 20,                     // 同分类内的排序，小的在前；不填按名称排
   enabled: true,                 // 设 false 即下线：首页不显示，路由直接 404
+  customHeader: false,           // true = 标题区由工具自己画（标题旁要放页面级控件时用）
 }
 ```
+
+> **页面顶部结构**：面包屑条（首页 / 工具名 + 收藏）由 `ToolLayout` 统一渲染，固定不滚动；
+> 下面的标题区默认也由平台渲染（名称 + 描述）。如果工具需要在标题右边放自己的控件
+> （例如字节换算页的「小数位」），把 `customHeader` 设为 `true`，然后在工具里自己写
+> `<h1>` + 说明文字，参考 `src/tools/byte-converter/index.tsx`。
 
 **3. 写组件 `index.tsx`（default export，不接收 props）**
 
@@ -254,7 +260,7 @@ npm run preview     # 打开 http://localhost:4173
 | 颜色转换 | HEX / `rgb()` / `hsl()` 输入互转，色块预览，逐项复制，非法输入即时提示 | `tools/color-converter/logic.ts` |
 | JSON 格式化 | 2 / 4 空格 / Tab 缩进，格式化、压缩、合法性校验、错误定位到行列、复制、下载 `.json` | `tools/json-formatter/logic.ts` |
 | 时间戳转换 | 秒 / 毫秒双向解释，本地时间 / UTC / ISO 8601，明确标注时区与偏移，非法输入校验 | `tools/timestamp-converter/logic.ts` |
-| 字节换算 | `bit` ~ `YB` 全单位（默认展开到 `EB`，`ZB` / `YB` 折叠），同时给出 1024 与 1000 两种进制，粘贴即算 | `tools/byte-converter/logic.ts` |
+| 字节换算 | `bit` ~ `YB` 全单位表格式排列（默认 7 行到 `PB`，其余折叠），1024 / 1000 双列对照，小数位 2/4/6 可切，带本次会话历史、点击即复制的数值、常用对照说明 | `tools/byte-converter/logic.ts` |
 | 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip | `tools/watermark/render.ts` |
 
 ---
