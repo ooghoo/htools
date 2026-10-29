@@ -73,7 +73,7 @@ export default function ByteConverter() {
           </div>
           <Button
             className={s['reset-btn']}
-            variant="secondary"
+            variant="primary"
             icon={RotateCcw}
             onClick={() => {
               setAmount('1')

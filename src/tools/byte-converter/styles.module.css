@@ -1,18 +1,31 @@
 .tool {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
   min-height: 100%;
+  /* 派生令牌：比默认边框更可见、微标签更清晰，均来自既有 token */
+  --bc: color-mix(in srgb, var(--border) 60%, var(--ring) 40%);
+  --ml: color-mix(in srgb, var(--muted-foreground) 65%, var(--foreground) 35%);
 }
 
-/* ---------- 输入面板：整页视觉重心，单一干净的表面 ---------- */
+/* ---------- 输入面板：扁平、细边框、宽松留白 ---------- */
 .panel {
   flex-shrink: 0;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-5);
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--bc);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm);
+}
+
+/* 终端风微标签：等宽、字距、轻灰，命中 Field 组件内部 <label> */
+.field-amount :global(label),
+.field-unit :global(label) {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ml);
+  font-weight: var(--weight-semibold);
 }
 
 .input-row {
@@ -24,7 +37,7 @@
 .amount {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex: 1;
   min-width: 0;
   max-width: 480px;
@@ -40,6 +53,7 @@
   flex-shrink: 0;
 }
 
+/* 重置按钮：沿用近黑主色，呼应参考图的暗色 CTA */
 .reset-btn {
   flex-shrink: 0;
   margin-left: auto;
@@ -58,55 +72,64 @@
 
 .results-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-3);
   flex-shrink: 0;
 }
 
 .results-title {
   margin: 0;
-  font-size: var(--text-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--foreground);
 }
 
 .results-count {
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: var(--ml);
   font-variant-numeric: tabular-nums;
 }
 
 .expand-btn {
   margin-left: auto;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
 }
 
-/* ---------- 结果列表：对齐的表格式行，列头说明进制 ---------- */
+/* ---------- 结果列表：细边框、扁平、数字为视觉主角 ---------- */
 .list {
-  border: 1px solid var(--border);
+  border: 1px solid var(--bc);
   border-radius: var(--radius-card);
   background: var(--card);
   overflow: hidden;
-  box-shadow: var(--shadow-xs);
 }
 
 .list-head,
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 168px 168px 32px;
+  grid-template-columns: minmax(0, 1fr) 176px 176px 32px;
   align-items: center;
   column-gap: var(--space-3);
 }
 
 .list-head {
-  padding: 9px var(--space-4);
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--border) 45%, var(--card));
+  padding: 10px var(--space-4);
+  border-bottom: 1px solid var(--bc);
+  background: color-mix(in srgb, var(--border) 42%, var(--card));
 }
 
 .head-cell {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   font-weight: var(--weight-semibold);
-  color: var(--muted-foreground);
+  color: var(--ml);
   white-space: nowrap;
 }
 
@@ -115,8 +138,8 @@
 }
 
 .row {
-  padding: 11px var(--space-4);
-  border-top: 1px solid var(--border);
+  padding: 12px var(--space-4);
+  border-top: 1px solid var(--bc);
   transition: background-color var(--duration-fast) ease;
 }
 
@@ -141,6 +164,11 @@
   color: var(--brand-foreground);
 }
 
+.row[data-source='true'] .val-num {
+  color: var(--brand-foreground);
+  font-weight: var(--weight-bold);
+}
+
 .row-id {
   display: flex;
   align-items: baseline;
@@ -150,14 +178,16 @@
 
 .sym {
   font-family: var(--font-mono);
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.01em;
 }
 
 .name {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--muted-foreground);
+  letter-spacing: 0.04em;
+  color: var(--ml);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,14 +199,17 @@
   border-radius: var(--radius-pill);
   background: var(--brand-2);
   color: var(--brand-foreground);
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
   line-height: 1.7;
 }
 
 .val-num {
   font-family: var(--font-mono);
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
   text-align: right;
   line-height: 1.3;
@@ -232,7 +265,7 @@
   }
 
   .val-num {
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
   }
 
   .row[data-source='true'] .sym {
