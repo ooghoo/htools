@@ -77,6 +77,7 @@ export default function WatermarkTool() {
   const [dragOver, setDragOver] = useState(false)
 
   const stageRef = useRef<HTMLDivElement>(null)
+  const panelBodyRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -316,31 +317,35 @@ export default function WatermarkTool() {
             )}
           </div>
 
-          <div className={s.thumbs}>
-            {items.map((item) => (
-              <div key={item.id} className={s['thumb-wrap']}>
-                <button
-                  type="button"
-                  className={s.thumb}
-                  data-active={item.id === activeItem?.id}
-                  onClick={() => setActiveId(item.id)}
-                  title={item.name}
-                  aria-label={`预览 ${item.name}`}
-                  aria-pressed={item.id === activeItem?.id}
-                >
-                  <img src={item.url} alt="" />
-                </button>
-                <button
-                  type="button"
-                  className={s['thumb-x']}
-                  aria-label={`移除 ${item.name}`}
-                  title="移除这张"
-                  onClick={() => removeItem(item.id)}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+          <div className={s.thumbBar}>
+            <div className={s.thumbs}>
+              {items.map((item) => (
+                <div key={item.id} className={s['thumb-wrap']}>
+                  <button
+                    type="button"
+                    className={s.thumb}
+                    data-active={item.id === activeItem?.id}
+                    onClick={() => setActiveId(item.id)}
+                    title={item.name}
+                    aria-label={`预览 ${item.name}`}
+                    aria-pressed={item.id === activeItem?.id}
+                  >
+                    <img src={item.url} alt="" />
+                  </button>
+                  <button
+                    type="button"
+                    className={s['thumb-x']}
+                    aria-label={`移除 ${item.name}`}
+                    title="移除这张"
+                    onClick={() => removeItem(item.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* + 固定在右侧，不随缩略图一起滚走 */}
             <button
               type="button"
               className={s['thumb-add']}
@@ -359,10 +364,19 @@ export default function WatermarkTool() {
 
         <aside className={s.panel}>
           <div className={s['panel-tabs']}>
-            <Segmented value={tab} options={TABS} onChange={setTab} ariaLabel="参数分组" />
+            <Segmented
+              value={tab}
+              options={TABS}
+              onChange={(next) => {
+                setTab(next)
+                // 切分组回到顶部，避免沿用上一个分组的滚动位置
+                panelBodyRef.current?.scrollTo({ top: 0 })
+              }}
+              ariaLabel="参数分组"
+            />
           </div>
 
-          <div className={s['panel-body']}>
+          <div ref={panelBodyRef} className={s['panel-body']}>
             {tab === 'content' && (
               <>
                 <Field label="快捷预设">
@@ -377,7 +391,7 @@ export default function WatermarkTool() {
                   />
                 </Field>
 
-                <Field label="水印类型">
+                <Field inline label="水印类型">
                   <Segmented
                     value={wm.kind}
                     options={[
@@ -439,9 +453,7 @@ export default function WatermarkTool() {
                   </>
                 )}
 
-                <div className={s.divider} />
-
-                <Field label="排列方式">
+                <Field inline label="排列方式">
                   <Segmented
                     value={wm.layout}
                     options={LAYOUTS}

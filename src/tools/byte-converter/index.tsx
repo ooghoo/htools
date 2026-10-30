@@ -9,7 +9,6 @@ import {
   BYTE_UNITS,
   DECIMAL_OPTIONS,
   DECIMAL_RATIO,
-  DEFAULT_HISTORY,
   DEFAULT_VISIBLE,
   QUICK_REFERENCE,
   convertAll,
@@ -32,7 +31,8 @@ export default function ByteConverter() {
   const [decimals, setDecimals] = useState<Decimals>(2)
   const [expanded, setExpanded] = useState(false)
   const [noteOpen, setNoteOpen] = useState(true)
-  const [history, setHistory] = useState<HistoryEntry[]>(DEFAULT_HISTORY)
+  // 历史只记真实发生过的换算，且只活在当前会话里，刷新或关掉浏览器就没了
+  const [history, setHistory] = useState<HistoryEntry[]>([])
 
   const fromUnit = BYTE_UNITS.find((unit) => unit.key === unitKey) ?? BYTE_UNITS[1]
   const value = parseAmount(amount)
@@ -141,35 +141,37 @@ export default function ByteConverter() {
           </Button>
         </div>
 
-        {/* 校验失败时占用历史那一行，卡片高度不跳 */}
-        {invalid ? (
-          <p className={s.error} role="alert">
-            请输入数字，支持小数与科学计数法（如 1.5e3）
-          </p>
-        ) : (
-          history.length > 0 && (
-            <div className={s.history}>
-              <span className={s.historyLabel}>历史</span>
-              {history.map((entry) => (
+        {/* 校验失败时占用历史那一行；历史为空也保留高度，首次计算时卡片不跳 */}
+        <div className={s.bottomRow}>
+          {invalid ? (
+            <p className={s.error} role="alert">
+              请输入数字，支持小数与科学计数法（如 1.5e3）
+            </p>
+          ) : (
+            history.length > 0 && (
+              <div className={s.history}>
+                <span className={s.historyLabel}>历史</span>
+                {history.map((entry) => (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    className={s.historyChip}
+                    onClick={() => applyHistory(entry)}
+                  >
+                    {entry.label}
+                  </button>
+                ))}
                 <button
-                  key={entry.key}
                   type="button"
-                  className={s.historyChip}
-                  onClick={() => applyHistory(entry)}
+                  className={s.historyClear}
+                  onClick={() => setHistory([])}
                 >
-                  {entry.label}
+                  清除
                 </button>
-              ))}
-              <button
-                type="button"
-                className={s.historyClear}
-                onClick={() => setHistory([])}
-              >
-                清除
-              </button>
-            </div>
-          )
-        )}
+              </div>
+            )
+          )}
+        </div>
       </section>
 
       {/* ---------- 结果 + 右栏说明 ---------- */}

@@ -10,4 +10,6 @@ export const manifest: ToolMeta = {
   accent: '#8b5cf6',
   keywords: ['json', 'format', '格式化', '美化', '压缩', '校验', 'beautify', 'minify', 'validate'],
   order: 10,
+  // 标题栏右侧要放「示例」按钮，标题区由工具自己渲染
+  customHeader: true,
 }

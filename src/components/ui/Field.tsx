@@ -13,14 +13,26 @@ export interface FieldProps {
   optional?: boolean
   /** 标签行右侧的附加操作，例如「随机」「示例」按钮 */
   action?: ReactNode
+  /** 标签与控件同一行、控件靠右（适合开关与分段控件，不建议配 hint/error） */
+  inline?: boolean
   className?: string
   children: ReactNode
 }
 
 /** 统一的表单字段外壳：标签 + 控件 + 说明/错误 */
-export function Field({ label, htmlFor, hint, error, optional, action, className, children }: FieldProps) {
+export function Field({
+  label,
+  htmlFor,
+  hint,
+  error,
+  optional,
+  action,
+  inline = false,
+  className,
+  children,
+}: FieldProps) {
   return (
-    <div className={cx(s.field, className)}>
+    <div className={cx(s.field, inline && s['field-inline'], className)}>
       {(label || action) && (
         <div className={s['label-row']}>
           {label && (

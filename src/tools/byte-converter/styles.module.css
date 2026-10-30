@@ -177,7 +177,11 @@
   pointer-events: none;
 }
 
-/* 历史 / 错误共用一行，切换时卡片高度不变 */
+/* 历史 / 错误共用一行；空的时候也占住 22px，卡片高度不跳 */
+.bottomRow {
+  min-height: 22px;
+}
+
 .history {
   display: flex;
   align-items: center;
@@ -243,7 +247,7 @@
 
 .reset {
   flex-shrink: 0;
-  height: 44px;
+  height: 40px;
   padding: 0 20px;
   border-radius: 9px;
   font-size: 10.5px;
@@ -271,15 +275,14 @@
 
 .tableHead {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  min-height: 49px;
-  padding: 14px 15px 12px;
+  height: 48px;
+  padding: 0 15px;
   border-bottom: 1px solid var(--line);
 }
 
 .countBadge {
-  margin-top: 1px;
   padding: 2px 6px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -496,17 +499,15 @@
 
 .cardHead {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  min-height: 41px;
-  padding: 14px 16px 10px;
+  height: 48px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--line);
 }
 
 /* 说明卡头没有分隔线，和下方标题连成一段 */
 .noteCard .cardHead {
-  min-height: 0;
-  padding-bottom: 0;
   border-bottom: none;
 }
 
@@ -516,7 +517,6 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  margin-top: -3px;
   margin-left: auto;
   border: 1px solid var(--border);
   border-radius: 6px;

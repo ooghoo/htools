@@ -60,6 +60,8 @@ export default function TimestampConverter() {
   return (
     <div className={s.grid}>
       <Card
+        className={s.card}
+        bodyClassName={s['card-body']}
         title="时间戳 → 日期时间"
         subtitle="切换单位只会改变「怎么读」这个数字，不会改写它"
       >
@@ -94,7 +96,7 @@ export default function TimestampConverter() {
 
         <ValueList items={tsItems} />
 
-        <p className={s.foot}>
+        <p className={`${s.foot} ${s['foot-bottom']}`}>
           <Globe aria-hidden="true" />
           <span>
             本地时间按 <span className={s.zone}>{zone.zone}</span>（{zone.offset}）显示，
@@ -103,7 +105,12 @@ export default function TimestampConverter() {
         </p>
       </Card>
 
-      <Card title="日期时间 → 时间戳" subtitle="输入框使用本机时区的年月日与时分秒">
+      <Card
+        className={s.card}
+        bodyClassName={s['card-body']}
+        title="日期时间 → 时间戳"
+        subtitle="输入框使用本机时区的年月日与时分秒"
+      >
         <Field label="本地时间" htmlFor="dt-input" error={dateError}>
           <div className={s['control-row']}>
             <Input
@@ -122,7 +129,7 @@ export default function TimestampConverter() {
 
         <ValueList items={dateItems} />
 
-        <p className={s.foot}>
+        <p className={`${s.foot} ${s['foot-bottom']}`}>
           <Globe aria-hidden="true" />
           <span>
             同一时刻在不同时区的时间戳相同；这里换算使用的是 <span className={s.zone}>{zone.offset}</span>。

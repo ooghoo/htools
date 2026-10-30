@@ -90,11 +90,24 @@
 }
 
 /* ---------------- 缩略图条 ---------------- */
+/* 外层固定高度，右侧「+」不参与滚动，始终可见 */
+.thumbBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
 .thumbs {
   display: flex;
   align-items: center;
   gap: 6px;
+  /* 用 auto 而不是 1：缩略图少时「+」紧跟在最后一张后面，多了才横向滚动 */
+  flex: 0 1 auto;
+  min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden; /* 只允许横向滚，竖向不该出现滚动条 */
   overscroll-behavior-x: contain;
   padding: 2px 2px 4px;
   scrollbar-width: thin;
@@ -229,11 +242,6 @@
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--border);
   background: var(--card);
-}
-
-.divider {
-  height: 1px;
-  background: var(--border);
 }
 
 .row {

@@ -112,10 +112,10 @@ export const DEFAULT_WATERMARK: WatermarkSettings = {
 }
 
 export const DEFAULT_OUTPUT: OutputSettings = {
-  size: 'custom',
+  size: 'original',
   custom: 1600,
   format: 'jpeg',
-  quality: 92,
+  quality: 100,
 }
 
 export const SWATCHES = ['#ffffff', '#000000', '#8e8e93', '#0071e3', '#ff3b30']

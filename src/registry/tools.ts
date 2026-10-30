@@ -6,6 +6,7 @@ import { manifest as colorConverter } from '@/tools/color-converter/manifest'
 import { manifest as jsonFormatter } from '@/tools/json-formatter/manifest'
 import { manifest as timestampConverter } from '@/tools/timestamp-converter/manifest'
 import { manifest as byteConverter } from '@/tools/byte-converter/manifest'
+import { manifest as base64 } from '@/tools/base64/manifest'
 import { manifest as watermark } from '@/tools/watermark/manifest'
 
 /**
@@ -25,6 +26,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   { ...jsonFormatter, component: lazy(() => import('@/tools/json-formatter')) },
   { ...timestampConverter, component: lazy(() => import('@/tools/timestamp-converter')) },
   { ...byteConverter, component: lazy(() => import('@/tools/byte-converter')) },
+  { ...base64, component: lazy(() => import('@/tools/base64')) },
   { ...watermark, component: lazy(() => import('@/tools/watermark')) },
 ]
 

@@ -109,14 +109,6 @@ export interface HistoryEntry {
   label: string
 }
 
-/** 首次进入时的示例，用户一旦换算就会被真实历史替换 */
-export const DEFAULT_HISTORY: HistoryEntry[] = [
-  { key: '1 KB', value: '1', unitKey: 'KB', label: '1 KB' },
-  { key: '1 MB', value: '1', unitKey: 'MB', label: '1 MB' },
-  { key: '1 GB', value: '1', unitKey: 'GB', label: '1 GB' },
-  { key: '1024 B', value: '1024', unitKey: 'B', label: '1024 B' },
-]
-
 export const HISTORY_LIMIT = 4
 
 /** 把一次输入并入历史：去重、置顶、限长 */

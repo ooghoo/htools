@@ -7,6 +7,18 @@
   min-width: 0;
 }
 
+/* 标签在左、控件靠右的单行字段（分段控件、开关这类横向控件用） */
+.field-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.field-inline > .label-row {
+  flex-shrink: 0;
+}
+
 .label-row {
   display: flex;
   align-items: baseline;
@@ -221,8 +233,9 @@
 }
 
 /* Field 是 column flex，默认会把子元素拉伸成整行；
-   分段控件要保持内容宽度，否则背景轨道会拖出一条空槽 */
-.field > .seg {
+   分段控件要保持内容宽度，否则背景轨道会拖出一条空槽。
+   inline 模式下父级是 row，align-self 会变成纵向对齐，得排除掉。 */
+.field:not(.field-inline) > .seg {
   align-self: flex-start;
 }
 

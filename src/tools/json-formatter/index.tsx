@@ -5,6 +5,7 @@ import { CopyButton } from '@/components/ui/CopyButton'
 import { Segmented } from '@/components/ui/Segmented'
 import { TextArea } from '@/components/ui/TextArea'
 import { downloadText } from '@/utils/download'
+import { manifest } from './manifest'
 import { formatBytes } from '@/utils/format'
 import {
   INDENT_OPTIONS,
@@ -56,7 +57,19 @@ export default function JsonFormatter() {
     output.length === 0 ? '空' : `${lineCount(output)} 行 · ${formatBytes(byteLength(output))}`
 
   return (
-    <>
+    <div className={s.root}>
+      {/* 标题栏：标题 + 说明在左，示例按钮在右 */}
+      <header className={s['title-row']}>
+        <div className={s['title-group']}>
+          <h1 className={s.title}>{manifest.name}</h1>
+          <p className={s.subtitle}>{manifest.pageDescription ?? manifest.description}</p>
+        </div>
+        <Button variant="ghost" icon={FileJson} onClick={() => setInput(JSON_SAMPLE)}>
+          示例
+        </Button>
+      </header>
+
+      {/* 工具栏：缩进在左，清空 + 格式化 + 压缩靠右 */}
       <div className={s.toolbar}>
         <Segmented
           value={indentKey}
@@ -64,19 +77,17 @@ export default function JsonFormatter() {
           onChange={handleIndentChange}
           ariaLabel="缩进方式"
         />
-        <Button variant="primary" icon={Wand2} onClick={() => run('pretty')} disabled={!input.trim()}>
-          格式化
-        </Button>
-        <Button icon={Minimize2} onClick={() => run('minify')} disabled={!input.trim()}>
-          压缩
-        </Button>
-        <div className={s['toolbar-spacer']} />
-        <Button variant="ghost" icon={FileJson} onClick={() => setInput(JSON_SAMPLE)}>
-          示例
-        </Button>
-        <Button variant="ghost" icon={Trash2} onClick={handleClear} disabled={!input && !output}>
-          清空
-        </Button>
+        <div className={s.actions}>
+          <Button variant="ghost" icon={Trash2} onClick={handleClear} disabled={!input && !output}>
+            清空
+          </Button>
+          <Button variant="primary" icon={Wand2} onClick={() => run('pretty')} disabled={!input.trim()}>
+            格式化
+          </Button>
+          <Button icon={Minimize2} onClick={() => run('minify')} disabled={!input.trim()}>
+            压缩
+          </Button>
+        </div>
       </div>
 
       <div className={s.panes}>
@@ -174,6 +185,6 @@ export default function JsonFormatter() {
           </div>
         </section>
       </div>
-    </>
+    </div>
   )
 }

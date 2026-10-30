@@ -268,15 +268,16 @@ npm run preview     # 打开 http://localhost:4173
 
 ---
 
-## 已完成的首批工具
+## 已有工具
 
 | 工具 | 能力 | 本地逻辑文件 |
 | --- | --- | --- |
-| 颜色转换 | HEX / `rgb()` / `hsl()` 输入互转，色块预览，逐项复制，非法输入即时提示 | `tools/color-converter/logic.ts` |
-| JSON 格式化 | 2 / 4 空格 / Tab 缩进，格式化、压缩、合法性校验、错误定位到行列、复制、下载 `.json` | `tools/json-formatter/logic.ts` |
-| 时间戳转换 | 秒 / 毫秒双向解释，本地时间 / UTC / ISO 8601，明确标注时区与偏移，非法输入校验 | `tools/timestamp-converter/logic.ts` |
-| 字节换算 | `bit` ~ `YB` 全单位表格式排列（默认 7 行到 `PB`，其余折叠），1024 / 1000 双列对照，小数位 2/4/6 可切，带本次会话历史、点击即复制的数值、常用对照说明 | `tools/byte-converter/logic.ts` |
-| 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip | `tools/watermark/render.ts` |
+| 颜色转换 | HEX / `rgb()` / `hsl()` 输入互转，输入与结果合并在一张卡、右侧独立色卡，逐项复制，非法输入即时提示 | `tools/color-converter/logic.ts` |
+| JSON 格式化 | 2 / 4 空格 / Tab 缩进，格式化、压缩、合法性校验、错误定位到行列、复制、下载 `.json`；标题栏放示例，双栏编辑器撑满高度 | `tools/json-formatter/logic.ts` |
+| 时间戳转换 | 秒 / 毫秒双向解释，本地时间 / UTC / ISO 8601，明确标注时区与偏移，非法输入校验；两张卡片等高，时区说明贴底 | `tools/timestamp-converter/logic.ts` |
+| 字节换算 | `bit` ~ `YB` 全单位表格式排列（默认 7 行到 `PB`，其余折叠），1024 / 1000 双列对照，小数位 2/4/6 可切，数值右侧悬停复制，本次会话历史（真实计算后才出现），常用对照说明 | `tools/byte-converter/logic.ts` |
+| Base64 编解码 | 文本与 Base64 双向转换，URL 安全变体、按 76 字符换行、UTF-8 自动识别，支持上传图片转 Base64 | `tools/base64/logic.ts` |
+| 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip；导出默认原图 / JPG / 100% | `tools/watermark/render.ts` |
 
 ---
 
