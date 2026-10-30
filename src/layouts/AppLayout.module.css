@@ -71,7 +71,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 56px;
+  height: 44px;
   z-index: 2;
   pointer-events: none;
   opacity: var(--pull, 0);
@@ -86,8 +86,8 @@
   transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--foreground) 28%, transparent) 0,
-    color-mix(in srgb, var(--foreground) 10%, transparent) 34%,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0,
+    color-mix(in srgb, var(--foreground) 5%, transparent) 32%,
     transparent 100%
   );
 }
@@ -98,8 +98,8 @@
   transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--foreground) 28%, transparent) 0,
-    color-mix(in srgb, var(--foreground) 10%, transparent) 34%,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0,
+    color-mix(in srgb, var(--foreground) 5%, transparent) 32%,
     transparent 100%
   );
 }

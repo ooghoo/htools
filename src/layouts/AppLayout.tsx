@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AppHeader } from '@/components/AppHeader'
 import { Sidebar } from '@/components/Sidebar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { useSmoothScroll } from '@/hooks/useSmoothScroll'
+import { useScrollEnhance } from '@/hooks/useScrollEnhance'
 import { getEnabledTools } from '@/registry/tools'
 import { cx } from '@/utils/cx'
 import s from './AppLayout.module.css'
@@ -21,7 +21,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(() => window.innerWidth >= 1440)
   const [userTookOver, setUserTookOver] = useState(false)
   const location = useLocation()
-  const { scrollRef, barRef, thumbRef, edgeTopRef, edgeBottomRef, resetScroll } = useSmoothScroll()
+  const { scrollRef, barRef, thumbRef, edgeTopRef, edgeBottomRef, resetScroll } = useScrollEnhance()
 
   useEffect(() => {
     if (!userTookOver) setOpen(wide)

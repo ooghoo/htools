@@ -7,10 +7,8 @@ const IDLE_HIDE_MS = 5000
 const MIN_THUMB_H = 32
 /** 到边后继续滚动，压力累到这个值算「拉满」 */
 const MAX_PULL = 44
-/** 每帧（16.7ms）向目标靠近的比例，越大越快 */
-const FRICTION = 0.22
 
-export interface SmoothScrollRefs {
+export interface ScrollEnhanceRefs {
   scrollRef: RefObject<HTMLDivElement>
   barRef: RefObject<HTMLDivElement>
   thumbRef: RefObject<HTMLDivElement>
@@ -21,15 +19,17 @@ export interface SmoothScrollRefs {
 }
 
 /**
- * 内容区滚动增强：滚轮缓动 + 自绘滚动条 + 到边压力反馈。
+ * 内容区滚动增强：自绘滚动条 + 到边压力提示。
  *
- * 关键取舍：**到边反馈不做位移**。之前试过橡皮筋，因为滚动容器整体平移，
- * 页面顶部那条吸顶栏会跟着晃，而且没内容的页面每滚一格都抖一下。
- * 现在改成在边缘叠一层渐变压力带，只改透明度，一个像素都不移动。
+ * 滚动本身完全交给浏览器 —— 不拦 wheel、不做缓动，滚多少是多少，
+ * 鼠标滚轮和触控板惯性都是系统原生手感。这里只做两件附加的事：
+ * 画一根会淡出的滚动条；到顶/到底后继续滚时，在边缘叠一层压力带。
  *
- * 只接管滚轮（wheel）；键盘、触控板惯性、拖拽滑块仍走原生行为。
+ * 压力带**只改透明度和自身缩放，不做任何位移**。早先试过橡皮筋：
+ * 滚动容器一平移，页面顶部那条吸顶栏就被带起来，内容不足一屏时每滚一格还会抖。
+ * 现在一个像素都不移动，顶部栏不可能被影响。
  */
-export function useSmoothScroll(): SmoothScrollRefs {
+export function useScrollEnhance(): ScrollEnhanceRefs {
   const scrollRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLDivElement>(null)
@@ -52,13 +52,6 @@ export function useSmoothScroll(): SmoothScrollRefs {
     const edgeBottom = edgeBottomRef.current
     if (!el || !bar || !thumb || !edgeTop || !edgeBottom) return
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    let target = el.scrollTop
-    let rafId = 0
-    let lastTime = 0
-    let animating = false
-    let lastWritten = -1
     let pullAmount = 0
     let pullSide: 'top' | 'bottom' | null = null
     let pullTimer = 0
@@ -97,11 +90,10 @@ export function useSmoothScroll(): SmoothScrollRefs {
       const maxTop = bar.clientHeight - thumb.offsetHeight
       const maxScroll = el.scrollHeight - el.clientHeight
       if (maxTop <= 0 || maxScroll <= 0) return
-      const next = (Math.max(0, Math.min(maxTop, thumbTop)) / maxTop) * maxScroll
-      el.scrollTop = next
+      el.scrollTop = (Math.max(0, Math.min(maxTop, thumbTop)) / maxTop) * maxScroll
     }
 
-    /* ---------------- 到边压力反馈（纯透明度，不位移） ---------------- */
+    /* ---------------- 到边压力带（纯透明度 + 自身缩放，不位移） ---------------- */
 
     const releasePull = () => {
       window.clearTimeout(pullTimer)
@@ -127,35 +119,11 @@ export function useSmoothScroll(): SmoothScrollRefs {
       pullTimer = window.setTimeout(releasePull, 160)
     }
 
-    /* ---------------- 滚轮缓动 ---------------- */
-
-    const step = (now: number) => {
-      const dt = Math.min(64, Math.max(1, now - lastTime))
-      lastTime = now
-      const diff = target - el.scrollTop
-      // 浏览器会把 scrollTop 取整到像素，容差必须 ≥1，否则循环永远收敛不了
-      if (Math.abs(diff) <= 1) {
-        el.scrollTop = target
-        lastWritten = target
-        animating = false
-        rafId = 0
-        return
-      }
-      animating = true
-      const delta = diff * (1 - Math.pow(1 - FRICTION, dt / 16.667))
-      // 每帧至少走 1px，避免取整后原地踏步
-      const next = el.scrollTop + (Math.abs(delta) < 1 ? Math.sign(diff) : delta)
-      lastWritten = next
-      el.scrollTop = next
-      rafId = requestAnimationFrame(step)
-    }
-
-    /** 事件目标在可滚动的子元素里（textarea、代码块…）时交还给原生滚动 */
+    /** 事件目标在可滚动的子元素里（textarea、代码块…）时不算到边 */
     const nestedCanScroll = (node: EventTarget | null, dy: number) => {
       let current = node as HTMLElement | null
       while (current && current !== el) {
-        const style = getComputedStyle(current)
-        const overflowY = style.overflowY
+        const overflowY = getComputedStyle(current).overflowY
         if (
           (overflowY === 'auto' || overflowY === 'scroll') &&
           current.scrollHeight > current.clientHeight + 1
@@ -169,21 +137,22 @@ export function useSmoothScroll(): SmoothScrollRefs {
       return false
     }
 
+    /**
+     * 只做判断，不拦事件：滚轮交给浏览器原生处理，
+     * 这里仅在「已经在顶还往上滚 / 已经在底还往下滚」时点亮压力带。
+     */
     const onWheel = (event: WheelEvent) => {
-      if (event.ctrlKey || event.defaultPrevented) return
+      if (event.ctrlKey) return
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientHeight : 1
       const dy = event.deltaY * unit
       if (!dy) return
-      if (nestedCanScroll(event.target, dy)) return
-
-      event.preventDefault()
 
       const max = el.scrollHeight - el.clientHeight
-      // 整页都装得下：没有可滚的，也就没有「到边」可言，什么都不动
       if (max <= 1) return
+      if (nestedCanScroll(event.target, dy)) return
 
       const atTop = el.scrollTop <= 0.5
-      const atBottom = el.scrollTop >= max - 0.5
+      const atBottom = el.scrollTop >= max - 1
       if (atTop && dy < 0) {
         pullAt('top', dy)
         return
@@ -193,29 +162,11 @@ export function useSmoothScroll(): SmoothScrollRefs {
         return
       }
       if (pullSide) releasePull()
-
-      if (reduced) {
-        target = Math.round(Math.max(0, Math.min(max, el.scrollTop + dy)))
-        el.scrollTop = target
-        return
-      }
-      target = Math.round(Math.max(0, Math.min(max, target + dy)))
-      if (!rafId) {
-        lastTime = performance.now()
-        rafId = requestAnimationFrame(step)
-      }
     }
 
     /* ---------------- 事件绑定 ---------------- */
 
     const onScroll = () => {
-      // 缓动过程中被别的力量改动了滚动位置（键盘、触控板、脚本），立刻收手
-      if (animating && Math.abs(el.scrollTop - lastWritten) > 2) {
-        cancelAnimationFrame(rafId)
-        rafId = 0
-        animating = false
-      }
-      if (!animating) target = el.scrollTop
       paint()
       if (performance.now() < suppressUntil.current) return
       showBar()
@@ -224,10 +175,6 @@ export function useSmoothScroll(): SmoothScrollRefs {
     const onBarDown = (event: PointerEvent) => {
       if (event.button !== 0) return
       event.preventDefault()
-      cancelAnimationFrame(rafId)
-      rafId = 0
-      animating = false
-      target = el.scrollTop
       dragging = true
       showBar()
       const rect = bar.getBoundingClientRect()
@@ -262,7 +209,8 @@ export function useSmoothScroll(): SmoothScrollRefs {
       showBar()
     }
 
-    el.addEventListener('wheel', onWheel, { passive: false })
+    // passive：绝不拦滚轮，滚动完全由浏览器负责
+    el.addEventListener('wheel', onWheel, { passive: true })
     el.addEventListener('scroll', onScroll, { passive: true })
     bar.addEventListener('pointerdown', onBarDown)
 
@@ -280,7 +228,6 @@ export function useSmoothScroll(): SmoothScrollRefs {
       window.removeEventListener('pointermove', onBarMove)
       window.removeEventListener('pointerup', onBarUp)
       ro.disconnect()
-      cancelAnimationFrame(rafId)
       window.clearTimeout(pullTimer)
       window.clearTimeout(idleTimer)
     }
