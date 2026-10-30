@@ -113,7 +113,7 @@ export function HomePage() {
 
       {/* 分类筛选：侧栏在窄屏是抽屉，这里保留一条横向筛选条 */}
       {!searching && (
-        <div className={s['filter-bar']} role="group" aria-label="按分类筛选">
+        <div className={cx(s['filter-bar'], 'scroll-thin')} role="group" aria-label="按分类筛选">
           <button
             type="button"
             className={s.filter}

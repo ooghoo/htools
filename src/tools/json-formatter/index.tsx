@@ -16,6 +16,7 @@ import {
   transform,
   type IndentOption,
 } from './logic'
+import { cx } from '@/utils/cx'
 import s from './styles.module.css'
 
 type IndentKey = '2' | '4' | 'tab'
@@ -135,7 +136,9 @@ export default function JsonFormatter() {
                   </>
                 )}
                 ：{status.error.message}
-                {status.error.excerpt && <code className={s.excerpt}>{status.error.excerpt}</code>}
+                {status.error.excerpt && (
+                  <code className={cx(s.excerpt, 'scroll-thin')}>{status.error.excerpt}</code>
+                )}
               </span>
             </div>
           )}

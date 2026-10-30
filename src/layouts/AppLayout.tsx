@@ -79,17 +79,17 @@ export function AppLayout() {
         <main className={s.content} id="main-content">
           <div id="tool-head-slot" className={s['tool-head-slot']} />
           <div className={s['scroll-wrap']}>
-            <div ref={scrollRef} className={s.scroll}>
+            <div ref={scrollRef} className={cx(s.scroll, 'scroll-hidden')}>
               <div className={s.page}>
                 <Outlet />
               </div>
             </div>
             {/* 到边压力带：只叠一层渐变，不移动任何内容 */}
-            <div ref={edgeTopRef} className={cx(s.edge, s['edge-top'])} aria-hidden="true" />
-            <div ref={edgeBottomRef} className={cx(s.edge, s['edge-bottom'])} aria-hidden="true" />
+            <div ref={edgeTopRef} className="scroll-edge scroll-edge-top" aria-hidden="true" />
+            <div ref={edgeBottomRef} className="scroll-edge scroll-edge-bottom" aria-hidden="true" />
             {/* 自绘滚动条：只属于内容区，永远不会跑到顶部栏上 */}
-            <div ref={barRef} className={s.scrollbar} data-visible="false" aria-hidden="true">
-              <div ref={thumbRef} className={s.thumb} />
+            <div ref={barRef} className="scroll-bar" data-visible="false" aria-hidden="true">
+              <div ref={thumbRef} className="scroll-bar-thumb" />
             </div>
           </div>
         </main>

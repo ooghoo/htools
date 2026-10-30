@@ -36,6 +36,7 @@ import {
   type WatermarkSettings,
   type ZipEntry,
 } from './render'
+import { cx } from '@/utils/cx'
 import s from './styles.module.css'
 
 type TabKey = 'content' | 'style' | 'export'
@@ -376,7 +377,7 @@ export default function WatermarkTool() {
             />
           </div>
 
-          <div ref={panelBodyRef} className={s['panel-body']}>
+          <div ref={panelBodyRef} className={cx(s['panel-body'], 'scroll-thin')}>
             {tab === 'content' && (
               <>
                 <Field label="快捷预设">

@@ -52,87 +52,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  /* none：既阻止滚动链，也关掉橡皮筋回弹（回弹由脚本自己控制，不会牵动顶部栏） */
+  /* 阻止滚动链：内容滚到底不会把整页/父层带走；原生滚动条由 .scroll-hidden 关掉 */
   overscroll-behavior-y: none;
-  /* 原生滚动条关掉，统一用自绘的那一根 */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.scroll::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-/* ---------- 到边压力带 ----------
- * 滚到顶/底后继续滚，对应的边缘淡入一层渐变，只改透明度和自身缩放，
- * 内容一个像素都不动 —— 所以顶部栏（面板的、页面里吸顶的）都不会被带起来。 */
-.edge {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 44px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: var(--pull, 0);
-  transition:
-    opacity 0.1s ease-out,
-    transform 0.1s ease-out;
-}
-
-.edge-top {
-  top: 0;
-  transform-origin: top center;
-  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--foreground) 14%, transparent) 0,
-    color-mix(in srgb, var(--foreground) 5%, transparent) 32%,
-    transparent 100%
-  );
-}
-
-.edge-bottom {
-  bottom: 0;
-  transform-origin: bottom center;
-  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--foreground) 14%, transparent) 0,
-    color-mix(in srgb, var(--foreground) 5%, transparent) 32%,
-    transparent 100%
-  );
-}
-
-/* ---------- 自绘滚动条 ---------- */
-.scrollbar {
-  position: absolute;
-  top: 6px;
-  right: 2px;
-  bottom: 6px;
-  width: 10px;
-  z-index: 3;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-/* 可见 + 内容确实溢出时才出现；一直保留布局，方便随时量高度 */
-.scrollbar[data-visible='true'][data-active='true'] {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.thumb {
-  width: 8px;
-  margin: 0 auto;
-  border-radius: var(--radius-pill);
-  background: var(--t-scrollbar);
-  transition: background-color var(--duration-fast) ease;
-}
-
-.scrollbar:hover .thumb {
-  background: color-mix(in srgb, var(--foreground) 30%, transparent);
 }
 
 /* 工具页头部插槽：位于滚动区之上，始终固定，与下方内容不在同一滚动层 */

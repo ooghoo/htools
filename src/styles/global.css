@@ -74,15 +74,70 @@ svg {
   outline-offset: 2px;
 }
 
-/* ---------- 细滚动条 ---------- */
+/* ============================================================
+ * 统一滚动区
+ * ------------------------------------------------------------
+ * 全站所有可滚区域都走这套：原生滚动条关掉，画一根 4px 的滑块。
+ * 结构（见 hooks/useScrollEnhance.ts）：
+ *   <div class="scroll-wrap">        position: relative，裁切用
+ *     <div class="scroll-body">      真正滚动的元素，加 class="scroll-hidden"
+ *     <div class="scroll-bar">       热区（比滑块宽，方便按住拖）
+ *       <div class="scroll-bar-thumb">
+ *   到边压力带用 .scroll-edge + .scroll-edge-top / .scroll-edge-bottom
+ * ============================================================ */
+
+/* 关掉原生滚动条，避免和自绘的那根并排出现 */
+.scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.scroll-bar {
+  position: absolute;
+  top: 6px;
+  right: 2px;
+  bottom: 6px;
+  /* 热区比滑块宽，4px 的滑块也能按住拖 */
+  width: 10px;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* 滚动过 + 内容确实溢出时才出现；一直保留布局，方便随时量高度 */
+.scroll-bar[data-visible='true'][data-active='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-bar-thumb {
+  width: 4px;
+  margin: 0 auto;
+  border-radius: var(--radius-pill);
+  background: var(--t-scrollbar);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.scroll-bar:hover .scroll-bar-thumb {
+  background: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+
+/* 内容区里的小滚动块（参数面板、筛选条、错误详情…）
+ * 用浏览器原生滚动条，但裁成同样的 4px、同样的颜色，视觉上和自绘那根一致 */
 .scroll-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--t-scrollbar) transparent;
 }
 
 .scroll-thin::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 .scroll-thin::-webkit-scrollbar-track {
@@ -91,9 +146,45 @@ svg {
 
 .scroll-thin::-webkit-scrollbar-thumb {
   background: var(--t-scrollbar);
-  border: 2px solid transparent;
   border-radius: var(--radius-pill);
-  background-clip: content-box;
+}
+
+/* 到边压力带：只改透明度和自身缩放，绝不位移内容 */
+.scroll-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--pull, 0);
+  transition:
+    opacity 0.1s ease-out,
+    transform 0.1s ease-out;
+}
+
+.scroll-edge-top {
+  top: 0;
+  transform-origin: top center;
+  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--brand) 8%, transparent) 0,
+    color-mix(in srgb, var(--brand) 2%, transparent) 32%,
+    transparent 100%
+  );
+}
+
+.scroll-edge-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--brand) 8%, transparent) 0,
+    color-mix(in srgb, var(--brand) 2%, transparent) 32%,
+    transparent 100%
+  );
 }
 
 /* ---------- 可访问性 ---------- */

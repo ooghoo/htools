@@ -50,7 +50,9 @@ export function useScrollEnhance(): ScrollEnhanceRefs {
     const thumb = thumbRef.current
     const edgeTop = edgeTopRef.current
     const edgeBottom = edgeBottomRef.current
-    if (!el || !bar || !thumb || !edgeTop || !edgeBottom) return
+    // 侧栏这类不需要到边提示的区域只传滚动条，压力带可省
+    const edgesOn = Boolean(edgeTop && edgeBottom)
+    if (!el || !bar || !thumb) return
 
     let pullAmount = 0
     let pullSide: 'top' | 'bottom' | null = null
@@ -99,11 +101,12 @@ export function useScrollEnhance(): ScrollEnhanceRefs {
       window.clearTimeout(pullTimer)
       pullAmount = 0
       pullSide = null
-      edgeTop.style.setProperty('--pull', '0')
-      edgeBottom.style.setProperty('--pull', '0')
+      edgeTop?.style.setProperty('--pull', '0')
+      edgeBottom?.style.setProperty('--pull', '0')
     }
 
     const pullAt = (side: 'top' | 'bottom', dy: number) => {
+      if (!edgeTop || !edgeBottom) return
       if (pullSide !== side) {
         pullAmount = 0
         pullSide = side
@@ -142,7 +145,7 @@ export function useScrollEnhance(): ScrollEnhanceRefs {
      * 这里仅在「已经在顶还往上滚 / 已经在底还往下滚」时点亮压力带。
      */
     const onWheel = (event: WheelEvent) => {
-      if (event.ctrlKey) return
+      if (!edgesOn || event.ctrlKey) return
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientHeight : 1
       const dy = event.deltaY * unit
       if (!dy) return
@@ -209,8 +212,8 @@ export function useScrollEnhance(): ScrollEnhanceRefs {
       showBar()
     }
 
-    // passive：绝不拦滚轮，滚动完全由浏览器负责
-    el.addEventListener('wheel', onWheel, { passive: true })
+    // passive：绝不拦滚轮，滚动完全由浏览器负责；没有压力带就不挂
+    if (edgesOn) el.addEventListener('wheel', onWheel, { passive: true })
     el.addEventListener('scroll', onScroll, { passive: true })
     bar.addEventListener('pointerdown', onBarDown)
 
@@ -222,7 +225,7 @@ export function useScrollEnhance(): ScrollEnhanceRefs {
     paint()
 
     return () => {
-      el.removeEventListener('wheel', onWheel)
+      if (edgesOn) el.removeEventListener('wheel', onWheel)
       el.removeEventListener('scroll', onScroll)
       bar.removeEventListener('pointerdown', onBarDown)
       window.removeEventListener('pointermove', onBarMove)
