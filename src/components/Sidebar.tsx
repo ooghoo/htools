@@ -12,7 +12,7 @@ interface SidebarProps {
 
 /**
  * 侧栏：全站共用同一份，首页 / 工具页 / 关于页的左侧区域完全一致。
- * 结构固定为三组：导航（全部工具）→ 收藏（工具图标 + 取消收藏）→ 工具（彩色圆点，当前页高亮）。
+ * 结构固定为三组：导航（全部工具）→ 最近使用 → 收藏 → 工具列表，图标统一走 ToolIcon。
  */
 export function Sidebar({ tools }: SidebarProps) {
   const { favorites, toggleFavorite } = useFavorites()
@@ -102,11 +102,7 @@ export function Sidebar({ tools }: SidebarProps) {
               className={s.item}
               aria-current={activeToolId === tool.id ? 'page' : undefined}
             >
-              <span
-                className={s.dot}
-                style={{ backgroundColor: tool.accent }}
-                aria-hidden="true"
-              />
+              <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
               <span className={s['item-name']}>{tool.name}</span>
             </Link>
           ))}

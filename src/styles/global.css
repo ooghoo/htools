@@ -17,12 +17,15 @@
 }
 
 html {
+  height: 100%;
   -webkit-text-size-adjust: 100%;
+  /* 整页不滚：所有滚动都发生在内容面板里，文档级滚动条不存在 */
+  overflow: hidden;
 }
 
 body {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
+  overflow: hidden;
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
@@ -34,8 +37,7 @@ body {
 }
 
 #root {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
 }
 
 a {

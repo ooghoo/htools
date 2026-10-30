@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { AppHeader } from '@/components/AppHeader'
 import { Sidebar } from '@/components/Sidebar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useSmoothScroll } from '@/hooks/useSmoothScroll'
 import { getEnabledTools } from '@/registry/tools'
-import { cx } from '@/utils/cx'
 import s from './AppLayout.module.css'
 
 /**
@@ -20,7 +20,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(() => window.innerWidth >= 1440)
   const [userTookOver, setUserTookOver] = useState(false)
   const location = useLocation()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const { scrollRef, barRef, thumbRef, resetScroll } = useSmoothScroll()
 
   useEffect(() => {
     if (!userTookOver) setOpen(wide)
@@ -33,8 +33,8 @@ export function AppLayout() {
 
   // 换页后回到顶部
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 0 })
-  }, [location.pathname])
+    resetScroll()
+  }, [location.pathname, resetScroll])
 
   // Esc 关闭抽屉
   useEffect(() => {
@@ -77,9 +77,15 @@ export function AppLayout() {
 
         <main className={s.content} id="main-content">
           <div id="tool-head-slot" className={s['tool-head-slot']} />
-          <div ref={scrollRef} className={cx(s.scroll, 'scroll-thin')}>
-            <div className={s.page}>
-              <Outlet />
+          <div className={s['scroll-wrap']}>
+            <div ref={scrollRef} className={s.scroll}>
+              <div className={s.page}>
+                <Outlet />
+              </div>
+            </div>
+            {/* 自绘滚动条：只属于内容区，永远不会跑到顶部栏上 */}
+            <div ref={barRef} className={s.scrollbar} data-visible="false" aria-hidden="true">
+              <div ref={thumbRef} className={s.thumb} />
             </div>
           </div>
         </main>

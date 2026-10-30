@@ -42,12 +42,14 @@ htools/
 │   │   ├── Sidebar.tsx            # 侧栏：全部工具 / 最近使用 / 收藏 / 工具（全站同一份）
 │   │   ├── ToolCard.tsx           # 工具卡片与列表行
 │   │   ├── ToolSearch.tsx         # 搜索框（「/」聚焦、Esc 清空）
-│   │   ├── ToolIcon.tsx           # 工具图标底色块
+│   │   ├── ToolIcon.tsx           # 工具图标（浅色圆底 + 同色线条，全站同一套）
 │   │   ├── EmptyState.tsx
 │   │   ├── ErrorBoundary.tsx      # 单个工具崩溃不影响整站
 │   │   ├── Toast.tsx
 │   │   └── ui/                    # 基础组件：Button / Input / Select / Slider ...
-│   ├── hooks/useMediaQuery.ts
+│   ├── hooks/
+│   │   ├── useMediaQuery.ts
+│   │   └── useSmoothScroll.ts      # 内容区滚动：滚轮缓动 / 自绘滚动条 / 到边回弹
 │   ├── layouts/
 │   │   ├── AppLayout.tsx          # 外壳：顶栏 + 侧栏 + 内容面板
 │   │   └── ToolLayout.tsx         # 工具页框架：面包屑 / 标题 / 收藏
@@ -181,6 +183,20 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 `flex: 1; min-height: 0` 分配剩余空间。**内部滚动区必须加 `overscroll-behavior: contain`**，
 否则滚到底后滚动会链式传给外层容器（scroll chaining，就是「滑到底页面跟着动」的那个问题）。
 窄屏下建议关掉满高，回到自然文档流。
+
+### 滚动与滚动条
+
+整页不滚，滚动只发生在内容面板的 `.scroll` 里，增强逻辑集中在 `hooks/useSmoothScroll.ts`：
+
+- **自绘滚动条**：原生滚动条关掉（`scrollbar-width: none` + `::-webkit-scrollbar`），
+  改用 `.scroll-wrap` 里的绝对定位滚动条。它只属于内容区，坐落在顶部栏下方，永远不会跑到顶栏上；
+  只接管滚轮（`wheel`），键盘、触控板惯性、拖拽滑块都走原生行为，不和系统惯性滚动打架；
+  滚动后显示，静止 5 秒淡出；内容不溢出时整根隐藏。
+- **到边反馈**：滚到顶/底后继续滚，内容会跟着回弹（`translate3d`，tanh 阻尼，最大 64px），
+  130ms 后弹回。位移加在 `.scroll` 自己身上，由 `.scroll-wrap` 的 `overflow: hidden` 裁掉，
+  所以顶部栏纹丝不动。
+- **别踩的坑**：`scrollTop` 会被浏览器取整到像素，缓动循环的收敛容差必须 ≥1 且每帧至少走 1px，
+  否则 `requestAnimationFrame` 会永远收敛不了（表现为外部设置滚动位置后被悄悄拉回）。
 
 ### 模块隔离
 

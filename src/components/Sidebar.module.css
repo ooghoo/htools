@@ -53,20 +53,12 @@
     color var(--duration-fast) ease;
 }
 
-.item svg {
+/* 只作用于直接子 svg（分组标题的 lucide 图标），不要影响 ToolIcon 内部的图标 */
+.item > svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
   color: var(--secondary-foreground);
-}
-
-/* 工具列表的彩色圆点：与图标同占 16px，视觉上对齐 */
-.dot {
-  width: 6px;
-  height: 6px;
-  margin: 0 5px;
-  flex-shrink: 0;
-  border-radius: var(--radius-pill);
 }
 
 .item:hover {
