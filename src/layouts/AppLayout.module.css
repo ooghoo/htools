@@ -64,6 +64,46 @@
   height: 0;
 }
 
+/* ---------- 到边压力带 ----------
+ * 滚到顶/底后继续滚，对应的边缘淡入一层渐变，只改透明度和自身缩放，
+ * 内容一个像素都不动 —— 所以顶部栏（面板的、页面里吸顶的）都不会被带起来。 */
+.edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--pull, 0);
+  transition:
+    opacity 0.1s ease-out,
+    transform 0.1s ease-out;
+}
+
+.edge-top {
+  top: 0;
+  transform-origin: top center;
+  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--foreground) 28%, transparent) 0,
+    color-mix(in srgb, var(--foreground) 10%, transparent) 34%,
+    transparent 100%
+  );
+}
+
+.edge-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+  transform: scaleY(calc(0.55 + 0.45 * var(--pull, 0)));
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--foreground) 28%, transparent) 0,
+    color-mix(in srgb, var(--foreground) 10%, transparent) 34%,
+    transparent 100%
+  );
+}
+
 /* ---------- 自绘滚动条 ---------- */
 .scrollbar {
   position: absolute;

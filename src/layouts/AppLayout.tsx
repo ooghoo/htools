@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useSmoothScroll } from '@/hooks/useSmoothScroll'
 import { getEnabledTools } from '@/registry/tools'
+import { cx } from '@/utils/cx'
 import s from './AppLayout.module.css'
 
 /**
@@ -20,7 +21,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(() => window.innerWidth >= 1440)
   const [userTookOver, setUserTookOver] = useState(false)
   const location = useLocation()
-  const { scrollRef, barRef, thumbRef, resetScroll } = useSmoothScroll()
+  const { scrollRef, barRef, thumbRef, edgeTopRef, edgeBottomRef, resetScroll } = useSmoothScroll()
 
   useEffect(() => {
     if (!userTookOver) setOpen(wide)
@@ -83,6 +84,9 @@ export function AppLayout() {
                 <Outlet />
               </div>
             </div>
+            {/* 到边压力带：只叠一层渐变，不移动任何内容 */}
+            <div ref={edgeTopRef} className={cx(s.edge, s['edge-top'])} aria-hidden="true" />
+            <div ref={edgeBottomRef} className={cx(s.edge, s['edge-bottom'])} aria-hidden="true" />
             {/* 自绘滚动条：只属于内容区，永远不会跑到顶部栏上 */}
             <div ref={barRef} className={s.scrollbar} data-visible="false" aria-hidden="true">
               <div ref={thumbRef} className={s.thumb} />

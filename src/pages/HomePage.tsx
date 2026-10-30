@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useSearchParams } from 'react-router-dom'
 import { LayoutGrid, Rows3, SearchX, X } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
@@ -23,6 +24,12 @@ export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState('')
   const [view, setView] = useState<ViewMode>(readViewMode)
+  const [headSlot, setHeadSlot] = useState<HTMLElement | null>(null)
+
+  // 插槽由 AppLayout 常驻渲染，挂载后把标题栏 portal 上去（layout 阶段，避免先闪一下）
+  useLayoutEffect(() => {
+    setHeadSlot(document.getElementById('tool-head-slot'))
+  }, [])
 
   const rawCategory = searchParams.get('cat')
   const activeCategory = CATEGORIES.some((c) => c.id === rawCategory)
@@ -57,46 +64,52 @@ export function HomePage() {
 
   const title = searching ? '搜索结果' : (category?.label ?? '全部工具')
   const countLabel = searching || activeCategory ? `${scoped.length} / ${allTools.length}` : String(allTools.length)
+
+  const head = (
+    <header className={s.head}>
+      <div className={s['title-row']}>
+        <h1 className={s.title}>{title}</h1>
+        <span className={s.count} aria-live="polite">
+          {countLabel}
+        </span>
+      </div>
+
+      <div className={s['head-tools']}>
+        <ToolSearch
+          value={query}
+          onChange={setQuery}
+          resultLabel={searching ? `${scoped.length} 个结果` : undefined}
+        />
+        <div className={s['view-switch']} role="group" aria-label="切换视图">
+          <button
+            type="button"
+            className={s['view-btn']}
+            aria-pressed={view === 'card'}
+            aria-label="卡片视图"
+            title="卡片视图"
+            onClick={() => changeView('card')}
+          >
+            <LayoutGrid aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={s['view-btn']}
+            aria-pressed={view === 'list'}
+            aria-label="列表视图"
+            title="列表视图"
+            onClick={() => changeView('list')}
+          >
+            <Rows3 aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </header>
+  )
+
   return (
     <>
-      <header className={s.head}>
-        <div className={s['title-row']}>
-          <h1 className={s.title}>{title}</h1>
-          <span className={s.count} aria-live="polite">
-            {countLabel}
-          </span>
-        </div>
-
-        <div className={s['head-tools']}>
-          <ToolSearch
-            value={query}
-            onChange={setQuery}
-            resultLabel={searching ? `${scoped.length} 个结果` : undefined}
-          />
-          <div className={s['view-switch']} role="group" aria-label="切换视图">
-            <button
-              type="button"
-              className={s['view-btn']}
-              aria-pressed={view === 'card'}
-              aria-label="卡片视图"
-              title="卡片视图"
-              onClick={() => changeView('card')}
-            >
-              <LayoutGrid aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              className={s['view-btn']}
-              aria-pressed={view === 'list'}
-              aria-label="列表视图"
-              title="列表视图"
-              onClick={() => changeView('list')}
-            >
-              <Rows3 aria-hidden="true" />
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* 标题栏挂到滚动区上方的插槽里：它不在滚动层内，任何滚动 / 到边反馈都碰不到它 */}
+      {headSlot ? createPortal(head, headSlot) : head}
 
       {/* 分类筛选：侧栏在窄屏是抽屉，这里保留一条横向筛选条 */}
       {!searching && (

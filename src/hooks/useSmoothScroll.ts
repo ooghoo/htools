@@ -5,8 +5,8 @@ import type { RefObject } from 'react'
 const IDLE_HIDE_MS = 5000
 /** 滑块最小高度，太短不好看也不好拖 */
 const MIN_THUMB_H = 32
-/** 边缘回弹的最大位移 */
-const MAX_BOUNCE = 64
+/** 到边后继续滚动，压力累到这个值算「拉满」 */
+const MAX_PULL = 44
 /** 每帧（16.7ms）向目标靠近的比例，越大越快 */
 const FRICTION = 0.22
 
@@ -14,21 +14,27 @@ export interface SmoothScrollRefs {
   scrollRef: RefObject<HTMLDivElement>
   barRef: RefObject<HTMLDivElement>
   thumbRef: RefObject<HTMLDivElement>
+  edgeTopRef: RefObject<HTMLDivElement>
+  edgeBottomRef: RefObject<HTMLDivElement>
   /** 换页时用：滚回顶部，同时不要因为这次归零把滚动条闪出来 */
   resetScroll: () => void
 }
 
 /**
- * 内容区滚动增强：滚轮缓动 + 自绘滚动条 + 到边回弹。
+ * 内容区滚动增强：滚轮缓动 + 自绘滚动条 + 到边压力反馈。
  *
- * 只接管滚轮（wheel）；键盘、触控板惯性滚动、拖拽滚动条仍走原生行为，
- * 所以不会和系统的惯性滚动打架。滚动条完全属于滚动容器自己，
- * 不会跑到顶部栏上去；静止 5 秒自动淡出。
+ * 关键取舍：**到边反馈不做位移**。之前试过橡皮筋，因为滚动容器整体平移，
+ * 页面顶部那条吸顶栏会跟着晃，而且没内容的页面每滚一格都抖一下。
+ * 现在改成在边缘叠一层渐变压力带，只改透明度，一个像素都不移动。
+ *
+ * 只接管滚轮（wheel）；键盘、触控板惯性、拖拽滑块仍走原生行为。
  */
 export function useSmoothScroll(): SmoothScrollRefs {
   const scrollRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLDivElement>(null)
+  const edgeTopRef = useRef<HTMLDivElement>(null)
+  const edgeBottomRef = useRef<HTMLDivElement>(null)
   /** 程序性归零后的一小段时间内不弹滚动条 */
   const suppressUntil = useRef(0)
 
@@ -42,7 +48,9 @@ export function useSmoothScroll(): SmoothScrollRefs {
     const el = scrollRef.current
     const bar = barRef.current
     const thumb = thumbRef.current
-    if (!el || !bar || !thumb) return
+    const edgeTop = edgeTopRef.current
+    const edgeBottom = edgeBottomRef.current
+    if (!el || !bar || !thumb || !edgeTop || !edgeBottom) return
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -50,14 +58,15 @@ export function useSmoothScroll(): SmoothScrollRefs {
     let rafId = 0
     let lastTime = 0
     let animating = false
-    let bounce = 0
-    let bounceTimer = 0
+    let lastWritten = -1
+    let pullAmount = 0
+    let pullSide: 'top' | 'bottom' | null = null
+    let pullTimer = 0
     let idleTimer = 0
     let dragging = false
     let thumbTop = 0
     let dragStartY = 0
     let dragStartTop = 0
-    let lastWritten = -1
 
     /* ---------------- 自绘滚动条 ---------------- */
 
@@ -92,32 +101,30 @@ export function useSmoothScroll(): SmoothScrollRefs {
       el.scrollTop = next
     }
 
-    /* ---------------- 边缘回弹 ---------------- */
+    /* ---------------- 到边压力反馈（纯透明度，不位移） ---------------- */
 
-    const applyBounce = (value: number) => {
-      bounce = value
-      el.style.transform = value ? `translate3d(0, ${value}px, 0)` : ''
+    const releasePull = () => {
+      window.clearTimeout(pullTimer)
+      pullAmount = 0
+      pullSide = null
+      edgeTop.style.setProperty('--pull', '0')
+      edgeBottom.style.setProperty('--pull', '0')
     }
 
-    const releaseBounce = () => {
-      window.clearTimeout(bounceTimer)
-      if (!bounce) return
-      bounce = 0
-      el.style.transition = 'transform 0.42s cubic-bezier(0.22, 1, 0.36, 1)'
-      el.style.transform = ''
-      window.setTimeout(() => {
-        el.style.transition = ''
-      }, 460)
-    }
-
-    const pull = (dy: number) => {
-      el.style.transition = 'none'
-      // 方向与系统一致：到顶继续上滚，内容跟着往下走；到底继续下滚，内容往上走。
-      // tanh 阻尼：越往边缘拉越硬，永远不会超过 MAX_BOUNCE。
-      applyBounce(MAX_BOUNCE * Math.tanh((bounce - dy * 0.45) / MAX_BOUNCE))
+    const pullAt = (side: 'top' | 'bottom', dy: number) => {
+      if (pullSide !== side) {
+        pullAmount = 0
+        pullSide = side
+      }
+      pullAmount = Math.min(MAX_PULL, pullAmount + Math.abs(dy) * 0.6)
+      const strength = Math.min(1, pullAmount / MAX_PULL)
+      const active = side === 'top' ? edgeTop : edgeBottom
+      const other = side === 'top' ? edgeBottom : edgeTop
+      other.style.setProperty('--pull', '0')
+      active.style.setProperty('--pull', String(strength))
       showBar()
-      window.clearTimeout(bounceTimer)
-      bounceTimer = window.setTimeout(releaseBounce, 130)
+      window.clearTimeout(pullTimer)
+      pullTimer = window.setTimeout(releasePull, 160)
     }
 
     /* ---------------- 滚轮缓动 ---------------- */
@@ -169,24 +176,24 @@ export function useSmoothScroll(): SmoothScrollRefs {
       if (!dy) return
       if (nestedCanScroll(event.target, dy)) return
 
+      event.preventDefault()
+
       const max = el.scrollHeight - el.clientHeight
-      if (max <= 0) {
-        event.preventDefault()
-        pull(dy)
-        return
-      }
+      // 整页都装得下：没有可滚的，也就没有「到边」可言，什么都不动
+      if (max <= 1) return
 
       const atTop = el.scrollTop <= 0.5
       const atBottom = el.scrollTop >= max - 0.5
-      if ((atTop && dy < 0) || (atBottom && dy > 0)) {
-        event.preventDefault()
-        pull(dy)
+      if (atTop && dy < 0) {
+        pullAt('top', dy)
         return
       }
+      if (atBottom && dy > 0) {
+        pullAt('bottom', dy)
+        return
+      }
+      if (pullSide) releasePull()
 
-      event.preventDefault()
-      // 从回弹状态回到正常滚动：先把位移收回去
-      if (bounce) releaseBounce()
       if (reduced) {
         target = Math.round(Math.max(0, Math.min(max, el.scrollTop + dy)))
         el.scrollTop = target
@@ -274,12 +281,10 @@ export function useSmoothScroll(): SmoothScrollRefs {
       window.removeEventListener('pointerup', onBarUp)
       ro.disconnect()
       cancelAnimationFrame(rafId)
-      window.clearTimeout(bounceTimer)
+      window.clearTimeout(pullTimer)
       window.clearTimeout(idleTimer)
-      el.style.transform = ''
-      el.style.transition = ''
     }
   }, [])
 
-  return { scrollRef, barRef, thumbRef, resetScroll }
+  return { scrollRef, barRef, thumbRef, edgeTopRef, edgeBottomRef, resetScroll }
 }
