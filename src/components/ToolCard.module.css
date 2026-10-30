@@ -9,20 +9,19 @@
   border-radius: var(--radius-card);
   transition:
     border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
     transform var(--duration-fast) var(--ease-out);
   animation: fade-rise var(--duration-base) var(--ease-out) both;
 }
 
 .card:hover {
   border-color: var(--ring);
-  box-shadow: var(--shadow-md);
+  background: color-mix(in srgb, var(--card) 88%, var(--muted));
   transform: translateY(-1px);
 }
 
 .card:focus-within {
   border-color: var(--ring);
-  box-shadow: var(--shadow-md);
 }
 
 /* 整卡可点：用绝对定位的链接盖住卡片，避免 <a> 里嵌套 <button> */

@@ -34,64 +34,15 @@
 }
 
 /* 问号帮助：hover / 聚焦时弹出描述气泡 */
-.help {
-  position: relative;
-  display: inline-flex;
-}
 
-.helpBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--card);
-  color: var(--muted-foreground);
-  cursor: help;
-  transition:
-    color var(--duration-fast) ease,
-    border-color var(--duration-fast) ease;
-}
 
 .helpBtn svg {
   width: 14px;
   height: 14px;
 }
 
-.helpBtn:hover {
-  color: var(--foreground);
-  border-color: var(--ring);
-}
 
-.helpBtn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
 
-.helpTip {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: 280px;
-  padding: 8px 10px;
-  border-radius: var(--radius);
-  background: var(--foreground);
-  color: var(--background);
-  font-size: var(--text-xs);
-  line-height: 1.5;
-  text-align: left;
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--duration-fast) ease;
-  z-index: 5;
-  pointer-events: none;
-}
 
 .help:hover .helpTip,
 .help:focus-within .helpTip {

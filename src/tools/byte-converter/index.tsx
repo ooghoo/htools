@@ -141,37 +141,35 @@ export default function ByteConverter() {
           </Button>
         </div>
 
-        {/* 校验失败时占用历史那一行；历史为空也保留高度，首次计算时卡片不跳 */}
-        <div className={s.bottomRow}>
-          {invalid ? (
-            <p className={s.error} role="alert">
-              请输入数字，支持小数与科学计数法（如 1.5e3）
-            </p>
-          ) : (
-            history.length > 0 && (
-              <div className={s.history}>
-                <span className={s.historyLabel}>历史</span>
-                {history.map((entry) => (
-                  <button
-                    key={entry.key}
-                    type="button"
-                    className={s.historyChip}
-                    onClick={() => applyHistory(entry)}
-                  >
-                    {entry.label}
-                  </button>
-                ))}
+        {/* 历史 / 错误只在有内容时占位，没有历史时卡片自动收窄 */}
+        {invalid ? (
+          <p className={s.error} role="alert">
+            请输入数字，支持小数与科学计数法（如 1.5e3）
+          </p>
+        ) : (
+          history.length > 0 && (
+            <div className={s.history}>
+              <span className={s.historyLabel}>历史</span>
+              {history.map((entry) => (
                 <button
+                  key={entry.key}
                   type="button"
-                  className={s.historyClear}
-                  onClick={() => setHistory([])}
+                  className={s.historyChip}
+                  onClick={() => applyHistory(entry)}
                 >
-                  清除
+                  {entry.label}
                 </button>
-              </div>
-            )
-          )}
-        </div>
+              ))}
+              <button
+                type="button"
+                className={s.historyClear}
+                onClick={() => setHistory([])}
+              >
+                清除
+              </button>
+            </div>
+          )
+        )}
       </section>
 
       {/* ---------- 结果 + 右栏说明 ---------- */}

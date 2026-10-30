@@ -1,0 +1,74 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--muted-foreground);
+  transition: color var(--duration-fast) ease;
+}
+
+.btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.wrap:hover .btn,
+.btn:focus-visible {
+  color: var(--foreground);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  z-index: 40;
+  max-width: 220px;
+  padding: 6px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--foreground);
+  color: var(--background);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transform: translate(-50%, 2px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+/* 小三角 */
+.tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: inherit;
+  transform: translate(-50%, -3px) rotate(45deg);
+}
+
+.wrap:hover .tip,
+.wrap:focus-within .tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}

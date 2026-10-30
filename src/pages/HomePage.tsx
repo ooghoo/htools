@@ -1,14 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Clock, LayoutGrid, Rows3, SearchX, X } from 'lucide-react'
-import { useRecentTools } from '@/app/contexts'
+import { useSearchParams } from 'react-router-dom'
+import { LayoutGrid, Rows3, SearchX, X } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { ToolCard } from '@/components/ToolCard'
-import { ToolIcon } from '@/components/ToolIcon'
 import { ToolSearch } from '@/components/ToolSearch'
 import { Button } from '@/components/ui/Button'
 import { CATEGORIES, getCategory } from '@/registry/categories'
-import { countByCategory, getEnabledTools, groupToolsByCategory, resolveToolsByIds, searchTools } from '@/registry/tools'
+import { countByCategory, getEnabledTools, groupToolsByCategory, searchTools } from '@/registry/tools'
 import { STORAGE_KEYS, readRaw, writeRaw } from '@/services/storage'
 import type { ToolCategoryId } from '@/types/tool'
 import { cx } from '@/utils/cx'
@@ -22,7 +20,6 @@ function readViewMode(): ViewMode {
 
 export function HomePage() {
   const allTools = useMemo(() => getEnabledTools(), [])
-  const { recent, clearRecent } = useRecentTools()
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState('')
   const [view, setView] = useState<ViewMode>(readViewMode)
@@ -43,11 +40,6 @@ export function HomePage() {
 
   const groups = useMemo(() => groupToolsByCategory(scoped), [scoped])
   const counts = useMemo(() => countByCategory(allTools), [allTools])
-  const recentTools = useMemo(
-    () => resolveToolsByIds(recent.map((entry) => entry.id)).slice(0, 6),
-    [recent],
-  )
-
   const changeView = useCallback((next: ViewMode) => {
     setView(next)
     writeRaw(STORAGE_KEYS.viewMode, next)
@@ -65,8 +57,6 @@ export function HomePage() {
 
   const title = searching ? '搜索结果' : (category?.label ?? '全部工具')
   const countLabel = searching || activeCategory ? `${scoped.length} / ${allTools.length}` : String(allTools.length)
-  const showRecent = !searching && !activeCategory && recentTools.length > 0
-
   return (
     <>
       <header className={s.head}>
@@ -141,28 +131,6 @@ export function HomePage() {
             )
           })}
         </div>
-      )}
-
-      {showRecent && (
-        <section className={s.recent} aria-label="最近使用">
-          <div className={s['recent-head']}>
-            <span className={s['recent-title']}>
-              <Clock aria-hidden="true" />
-              最近使用
-            </span>
-            <button type="button" className={s['recent-clear']} onClick={clearRecent}>
-              清空
-            </button>
-          </div>
-          <div className={s.chips}>
-            {recentTools.map((tool) => (
-              <Link key={tool.id} to={`/tools/${tool.id}`} className={s.chip}>
-                <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
-                {tool.name}
-              </Link>
-            ))}
-          </div>
-        </section>
       )}
 
       {scoped.length === 0 ? (

@@ -381,6 +381,7 @@ export default function WatermarkTool() {
               <>
                 <Field label="快捷预设">
                   <Chips
+                    scrollable
                     options={PRESETS.map((preset) => ({ value: preset.name, label: preset.name }))}
                     value={activePreset}
                     ariaLabel="水印预设"
@@ -469,6 +470,9 @@ export default function WatermarkTool() {
                   max={90}
                   step={1}
                   suffix="°"
+                  editable
+                  inputMin={-360}
+                  inputMax={360}
                   onChange={(angle) => patch({ angle })}
                 />
                 <Chips

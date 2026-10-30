@@ -135,72 +135,14 @@
 }
 
 /* ---------- 最近使用 ---------- */
-.recent {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
 
-.recent-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
 
-.recent-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--muted-foreground);
-}
 
-.recent-title svg {
-  width: 13px;
-  height: 13px;
-}
 
-.recent-clear {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-}
 
-.recent-clear:hover {
-  background: var(--muted);
-  color: var(--foreground);
-}
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 10px 0 5px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--card);
-  font-size: var(--text-sm);
-  transition:
-    border-color var(--duration-fast) ease,
-    background-color var(--duration-fast) ease,
-    transform var(--duration-fast) ease;
-}
 
-.chip:hover {
-  border-color: var(--ring);
-  background: var(--accent);
-  transform: translateY(-1px);
-}
 
 /* ---------- 分类筛选条（移动端侧栏收起时仍可切分类） ---------- */
 .filter-bar {

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Download, Eraser, FlaskConical, HelpCircle, ImagePlus } from 'lucide-react'
+import { Download, Eraser, FlaskConical, ImagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { CopyButton } from '@/components/ui/CopyButton'
 import { Segmented } from '@/components/ui/Segmented'
@@ -81,23 +81,10 @@ export default function Base64Tool() {
 
   return (
     <div className={s.app} data-fill={isWide ? 'true' : undefined}>
-      {/* 自定义标题栏：标题 + 「?」说明，示例按钮置于标题栏右侧 */}
+      {/* 自定义标题栏：示例按钮置于标题栏右侧 */}
       <header className={s.titleRow}>
         <div className={s.titleGroup}>
           <h1 className={s.title}>{manifest.name}</h1>
-          <span className={s.help}>
-            <button
-              type="button"
-              className={s.helpBtn}
-              aria-label="使用说明"
-              aria-describedby="base64-help-tip"
-            >
-              <HelpCircle aria-hidden="true" />
-            </button>
-            <span className={s.helpTip} role="tooltip" id="base64-help-tip">
-              {manifest.pageDescription}
-            </span>
-          </span>
         </div>
         <div className={s.titleActions}>
           <Button variant="ghost" icon={FlaskConical} onClick={handleSample}>
@@ -123,12 +110,12 @@ export default function Base64Tool() {
               label="URL 安全"
               checked={urlSafe}
               onChange={setUrlSafe}
-              description={isEncode ? '输出 - _ 并去 =' : '接受 - _ 输入'}
+              labelTip={isEncode ? '输出 - _ 并去 =' : '接受 - _ 输入'}
             />
           </div>
           {isEncode && (
             <div className={s.opt}>
-              <Toggle label="自动换行" checked={wrap} onChange={setWrap} description="每 76 字符换行" />
+              <Toggle label="自动换行" checked={wrap} onChange={setWrap} labelTip="每 76 字符换行" />
             </div>
           )}
         </div>

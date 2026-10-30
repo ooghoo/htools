@@ -43,7 +43,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  /* none：既阻止滚动链，也关掉橡皮筋回弹，吸顶栏不会跟着抖 */
+  overscroll-behavior-y: none;
   scrollbar-gutter: stable;
 }
 
@@ -70,7 +71,7 @@
   max-width: var(--content-max);
   min-height: 100%;
   margin: 0 auto;
-  padding: 20px 24px var(--space-10);
+  padding: 20px 24px;
 }
 
 /*
@@ -79,7 +80,6 @@
  */
 .page:has([data-fill='true']) {
   height: 100%;
-  padding-bottom: 20px;
 }
 
 .backdrop {

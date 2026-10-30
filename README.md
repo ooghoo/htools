@@ -39,7 +39,7 @@ htools/
 │   │   └── contexts.ts            # context 定义与 useTheme / useFavorites 等访问器
 │   ├── components/
 │   │   ├── AppHeader.tsx          # 顶栏
-│   │   ├── Sidebar.tsx            # 侧栏：导航 / 收藏 / 工具（全站同一份）
+│   │   ├── Sidebar.tsx            # 侧栏：全部工具 / 最近使用 / 收藏 / 工具（全站同一份）
 │   │   ├── ToolCard.tsx           # 工具卡片与列表行
 │   │   ├── ToolSearch.tsx         # 搜索框（「/」聚焦、Esc 清空）
 │   │   ├── ToolIcon.tsx           # 工具图标底色块
@@ -52,7 +52,7 @@ htools/
 │   │   ├── AppLayout.tsx          # 外壳：顶栏 + 侧栏 + 内容面板
 │   │   └── ToolLayout.tsx         # 工具页框架：面包屑 / 标题 / 收藏
 │   ├── pages/
-│   │   ├── HomePage.tsx           # 首页：分类分组 + 搜索 + 收藏 + 最近使用
+│   │   ├── HomePage.tsx           # 首页：分类分组 + 搜索 + 收藏
 │   │   ├── ToolPage.tsx           # /tools/:toolId
 │   │   ├── AboutPage.tsx
 │   │   └── NotFoundPage.tsx
@@ -205,9 +205,10 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 | `Input` / `TextArea` / `Select` | 表单控件，统一高度、焦点环、错误态；`Input` / `Select` 另有 `size="lg"`（46px 主输入） |
 | `Field` | 标签 + 控件 + 说明 / 错误的一体外壳 |
 | `Slider` / `Toggle` / `Segmented` / `Chips` | 连续调节、开关、互斥切换、快捷标签 |
-| `Card` | 内容卡片（`narrow` 窄卡、`flush` 去内边距） |
+| `Card` | 内容卡片（`narrow` 窄卡、`flush` 去内边距）；无阴影，只用描边分层 |
 | `ValueList` | 结果列表：标签 + 等宽值 + 复制按钮 |
 | `CopyButton` | 复制 + 成功提示，内部处理降级 |
+| `InfoTip` | 标签后的小问号，悬浮 / 聚焦显示说明 |
 | `EmptyState` | 空状态 |
 | `Toast` | 全局轻提示 |
 
@@ -224,7 +225,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 | 键 | 内容 |
 | --- | --- |
 | `htools:favs` | 收藏的工具 ID 数组（沿用 v1 的键，老收藏能继承） |
-| `htools:recent` | 最近使用：`{ id, at }[]`，最多 6 条，**不含任何输入内容** |
+| `htools:recent` | 最近使用：`{ id, at }[]`，最多 6 条、侧栏只展示 2 条，**不含任何输入内容** |
 | `htools:theme` | `light` / `dark`，不设则跟随系统 |
 | `htools:view` | 首页卡片 / 列表视图 |
 
@@ -299,7 +300,7 @@ npm run preview     # 打开 http://localhost:4173
 | 首页 | 5 个工具入口按分类渲染；搜索「json」只剩 1 个结果；无结果时出现空状态并可清除 |
 | 分类 | `?cat=text` 只显示文本分类工具 |
 | 收藏 | 点击收藏写入 LocalStorage，刷新后侧栏仍保留 |
-| 最近使用 | 访问工具后首页出现「最近使用」区块 |
+| 最近使用 | 访问工具后左侧栏「最近使用」出现在收藏上方，最多 2 条 |
 | 颜色 | 非法输入报错；`#00ff00` → `rgb(0, 255, 0)` / `hsl(120, 100%, 50%)`；3 位简写 `f00` → `#FF0000` |
 | JSON | 示例可格式化（多行）；可压缩为单行；`{"a": 1,}` 报错并定位到行 / 列 |
 | 时间戳 | `1793085342` 秒 → 本地 `2026-10-27 15:15:42`、ISO `2026-10-27T07:15:42.000Z`；显示 `Asia/Shanghai`；切毫秒后重新解释 |

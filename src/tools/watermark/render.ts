@@ -119,7 +119,7 @@ export const DEFAULT_OUTPUT: OutputSettings = {
 }
 
 export const SWATCHES = ['#ffffff', '#000000', '#8e8e93', '#0071e3', '#ff3b30']
-export const ANGLE_PRESETS = [-45, -30, 0, 30, 45, 90]
+export const ANGLE_PRESETS = [-45, -30, 0, 30, 45]
 export const MAX_PIXELS = 16777216 // Safari 画布安全上限
 
 export interface Preset {

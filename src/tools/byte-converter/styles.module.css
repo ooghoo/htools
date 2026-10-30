@@ -177,11 +177,6 @@
   pointer-events: none;
 }
 
-/* 历史 / 错误共用一行；空的时候也占住 22px，卡片高度不跳 */
-.bottomRow {
-  min-height: 22px;
-}
-
 .history {
   display: flex;
   align-items: center;

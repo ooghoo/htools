@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Heart, LayoutGrid, X } from 'lucide-react'
-import { useFavorites } from '@/app/contexts'
+import { Clock, Heart, LayoutGrid, X } from 'lucide-react'
+import { useFavorites, useRecentTools } from '@/app/contexts'
 import { resolveToolsByIds } from '@/registry/tools'
 import type { ToolDefinition } from '@/types/tool'
 import { ToolIcon } from './ToolIcon'
@@ -16,6 +16,7 @@ interface SidebarProps {
  */
 export function Sidebar({ tools }: SidebarProps) {
   const { favorites, toggleFavorite } = useFavorites()
+  const { recent } = useRecentTools()
   const location = useLocation()
 
   const isHome = location.pathname === '/'
@@ -23,17 +24,38 @@ export function Sidebar({ tools }: SidebarProps) {
     ? location.pathname.slice('/tools/'.length)
     : null
   const favoriteTools = resolveToolsByIds(favorites)
+  // 侧栏只留最近两条，多了会挤占收藏与工具列表
+  const recentTools = resolveToolsByIds(recent.map((entry) => entry.id)).slice(0, 2)
 
   return (
     <aside className={s.sidebar} id="app-sidebar" aria-label="主导航">
       <nav className={s.nav}>
         <div className={s.group}>
-          <p className={s['group-label']}>导航</p>
           <Link to="/" className={s.item} aria-current={isHome ? 'page' : undefined}>
             <LayoutGrid aria-hidden="true" />
             <span className={s['item-name']}>全部工具</span>
           </Link>
         </div>
+
+        {recentTools.length > 0 && (
+          <div className={s.group}>
+            <p className={s['group-label']}>
+              <Clock aria-hidden="true" />
+              最近使用
+            </p>
+            {recentTools.map((tool) => (
+              <Link
+                key={tool.id}
+                to={`/tools/${tool.id}`}
+                className={s.item}
+                aria-current={activeToolId === tool.id ? 'page' : undefined}
+              >
+                <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
+                <span className={s['item-name']}>{tool.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className={s.group}>
           <p className={s['group-label']}>
