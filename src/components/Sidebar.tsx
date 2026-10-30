@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Clock, Heart, LayoutGrid, X } from 'lucide-react'
 import { useFavorites, useRecentTools } from '@/app/contexts'
-import { useScrollEnhance } from '@/hooks/useScrollEnhance'
 import { resolveToolsByIds } from '@/registry/tools'
 import type { ToolDefinition } from '@/types/tool'
 import { cx } from '@/utils/cx'
@@ -20,8 +19,6 @@ export function Sidebar({ tools }: SidebarProps) {
   const { favorites, toggleFavorite } = useFavorites()
   const { recent } = useRecentTools()
   const location = useLocation()
-  // 侧栏与内容区共用同一套滚动条（4px、悬停加深、拖动/点轨道都可用）
-  const { scrollRef, barRef, thumbRef } = useScrollEnhance()
 
   const isHome = location.pathname === '/'
   const activeToolId = location.pathname.startsWith('/tools/')
@@ -33,74 +30,21 @@ export function Sidebar({ tools }: SidebarProps) {
 
   return (
     <aside className={s.sidebar} id="app-sidebar" aria-label="主导航">
-      <div className={s['nav-wrap']}>
-        <nav ref={scrollRef} className={cx(s.nav, 'scroll-hidden')}>
-          <div className={s.group}>
-            <Link to="/" className={s.item} aria-current={isHome ? 'page' : undefined}>
-              <LayoutGrid aria-hidden="true" />
-              <span className={s['item-name']}>全部工具</span>
-            </Link>
-          </div>
+      <nav className={cx(s.nav, 'scroll-thin')}>
+        <div className={s.group}>
+          <Link to="/" className={s.item} aria-current={isHome ? 'page' : undefined}>
+            <LayoutGrid aria-hidden="true" />
+            <span className={s['item-name']}>全部工具</span>
+          </Link>
+        </div>
 
-          {recentTools.length > 0 && (
-            <div className={s.group}>
-              <p className={s['group-label']}>
-                <Clock aria-hidden="true" />
-                最近使用
-              </p>
-              {recentTools.map((tool) => (
-                <Link
-                  key={tool.id}
-                  to={`/tools/${tool.id}`}
-                  className={s.item}
-                  aria-current={activeToolId === tool.id ? 'page' : undefined}
-                >
-                  <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
-                  <span className={s['item-name']}>{tool.name}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-
+        {recentTools.length > 0 && (
           <div className={s.group}>
             <p className={s['group-label']}>
-              <Heart aria-hidden="true" />
-              收藏
+              <Clock aria-hidden="true" />
+              最近使用
             </p>
-            {favoriteTools.length === 0 ? (
-              <p className={s.hint}>还没有收藏 —— 点卡片右上角的心形，就能固定到这里。</p>
-            ) : (
-              favoriteTools.map((tool) => (
-                <div
-                  key={tool.id}
-                  className={s['fav-row']}
-                  data-active={activeToolId === tool.id ? 'true' : undefined}
-                >
-                  <Link
-                    to={`/tools/${tool.id}`}
-                    className={s['fav-link']}
-                    aria-current={activeToolId === tool.id ? 'page' : undefined}
-                  >
-                    <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
-                    <span>{tool.name}</span>
-                  </Link>
-                  <button
-                    type="button"
-                    className={s.remove}
-                    onClick={() => toggleFavorite(tool.id)}
-                    aria-label={`取消收藏 ${tool.name}`}
-                    title="取消收藏"
-                  >
-                    <X aria-hidden="true" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className={s.group}>
-            <p className={s['group-label']}>工具</p>
-            {tools.map((tool) => (
+            {recentTools.map((tool) => (
               <Link
                 key={tool.id}
                 to={`/tools/${tool.id}`}
@@ -112,11 +56,59 @@ export function Sidebar({ tools }: SidebarProps) {
               </Link>
             ))}
           </div>
-        </nav>
-        <div ref={barRef} className="scroll-bar" data-visible="false" aria-hidden="true">
-          <div ref={thumbRef} className="scroll-bar-thumb" />
+        )}
+
+        <div className={s.group}>
+          <p className={s['group-label']}>
+            <Heart aria-hidden="true" />
+            收藏
+          </p>
+          {favoriteTools.length === 0 ? (
+            <p className={s.hint}>还没有收藏 —— 点卡片右上角的心形，就能固定到这里。</p>
+          ) : (
+            favoriteTools.map((tool) => (
+              <div
+                key={tool.id}
+                className={s['fav-row']}
+                data-active={activeToolId === tool.id ? 'true' : undefined}
+              >
+                <Link
+                  to={`/tools/${tool.id}`}
+                  className={s['fav-link']}
+                  aria-current={activeToolId === tool.id ? 'page' : undefined}
+                >
+                  <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
+                  <span>{tool.name}</span>
+                </Link>
+                <button
+                  type="button"
+                  className={s.remove}
+                  onClick={() => toggleFavorite(tool.id)}
+                  aria-label={`取消收藏 ${tool.name}`}
+                  title="取消收藏"
+                >
+                  <X aria-hidden="true" />
+                </button>
+              </div>
+            ))
+          )}
         </div>
-      </div>
+
+        <div className={s.group}>
+          <p className={s['group-label']}>工具</p>
+          {tools.map((tool) => (
+            <Link
+              key={tool.id}
+              to={`/tools/${tool.id}`}
+              className={s.item}
+              aria-current={activeToolId === tool.id ? 'page' : undefined}
+            >
+              <ToolIcon icon={tool.icon} accent={tool.accent} size="sm" />
+              <span className={s['item-name']}>{tool.name}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
 
       <p className={s.foot}>
         <Link to="/about" className={s['foot-link']}>

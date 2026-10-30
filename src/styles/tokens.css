@@ -56,7 +56,8 @@
 
   /* ---------- 页面级私有令牌 ---------- */
   --t-fav: hsl(259 83% 62%);
-  --t-scrollbar: hsl(240 1.1% 64.31% / 0.42);
+  /* 全站统一的 4px 滚动条滑块颜色：浅灰，别太重也别看不见 */
+  --t-scrollbar: hsl(240 2% 60% / 0.55);
 
   /* ---------- 字体 ---------- */
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC',
@@ -167,7 +168,7 @@ html[data-theme='dark'] {
   --sidebar-accent-foreground: hsl(0 0% 98.04%);
 
   --t-fav: hsl(259 90% 80%);
-  --t-scrollbar: hsl(240 0.83% 52.55% / 0.5);
+  --t-scrollbar: hsl(240 2% 64% / 0.55);
 
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.3);

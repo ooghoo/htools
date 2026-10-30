@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { AppHeader } from '@/components/AppHeader'
 import { Sidebar } from '@/components/Sidebar'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { useScrollEnhance } from '@/hooks/useScrollEnhance'
 import { getEnabledTools } from '@/registry/tools'
 import { cx } from '@/utils/cx'
 import s from './AppLayout.module.css'
@@ -21,7 +20,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(() => window.innerWidth >= 1440)
   const [userTookOver, setUserTookOver] = useState(false)
   const location = useLocation()
-  const { scrollRef, barRef, thumbRef, edgeTopRef, edgeBottomRef, resetScroll } = useScrollEnhance()
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!userTookOver) setOpen(wide)
@@ -34,8 +33,8 @@ export function AppLayout() {
 
   // 换页后回到顶部
   useEffect(() => {
-    resetScroll()
-  }, [location.pathname, resetScroll])
+    scrollRef.current?.scrollTo({ top: 0 })
+  }, [location.pathname])
 
   // Esc 关闭抽屉
   useEffect(() => {
@@ -78,18 +77,9 @@ export function AppLayout() {
 
         <main className={s.content} id="main-content">
           <div id="tool-head-slot" className={s['tool-head-slot']} />
-          <div className={s['scroll-wrap']}>
-            <div ref={scrollRef} className={cx(s.scroll, 'scroll-hidden')}>
-              <div className={s.page}>
-                <Outlet />
-              </div>
-            </div>
-            {/* 到边压力带：只叠一层渐变，不移动任何内容 */}
-            <div ref={edgeTopRef} className="scroll-edge scroll-edge-top" aria-hidden="true" />
-            <div ref={edgeBottomRef} className="scroll-edge scroll-edge-bottom" aria-hidden="true" />
-            {/* 自绘滚动条：只属于内容区，永远不会跑到顶部栏上 */}
-            <div ref={barRef} className="scroll-bar" data-visible="false" aria-hidden="true">
-              <div ref={thumbRef} className="scroll-bar-thumb" />
+          <div ref={scrollRef} className={cx(s.scroll, 'scroll-thin')}>
+            <div className={s.page}>
+              <Outlet />
             </div>
           </div>
         </main>

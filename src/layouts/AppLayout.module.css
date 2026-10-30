@@ -39,21 +39,14 @@
   overflow: hidden;
 }
 
-/* 滚动区外壳：裁掉回弹位移，滚动条也挂在这一层，与顶部栏互不干扰 */
-.scroll-wrap {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  overflow: hidden;
-}
-
 .scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  /* 阻止滚动链：内容滚到底不会把整页/父层带走；原生滚动条由 .scroll-hidden 关掉 */
+  /* 阻止滚动链：内容滚到底不会把整页/父层带走 */
   overscroll-behavior-y: none;
+  /* 有没有滚动条都占住这 4px，避免内容在溢出与否之间横跳 */
+  scrollbar-gutter: stable;
 }
 
 /* 工具页头部插槽：位于滚动区之上，始终固定，与下方内容不在同一滚动层 */
