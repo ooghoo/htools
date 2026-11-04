@@ -210,6 +210,8 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 
 **规矩**：工具里不写死颜色值，只用 `var(--*)`；需要页面私有变量时用 `--t-` 前缀，避免和全局 token 撞名。
 
+**布局**：内容面板不设 `max-width`，拉宽浏览器时铺满，左右只保留固定 24px 内边距（`.page` / 首页标题栏 / 工具页面包屑三处一致）。里面靠响应式网格自己铺：首页卡片 `repeat(auto-fill, minmax(236px, 1fr))`，两栏工具用 `minmax(0, 1fr)` + 固定右栏。别再用居中限宽，容易在大屏上留出两片死白。
+
 可复用组件（`src/components/ui/`）：
 
 | 组件 | 用途 |

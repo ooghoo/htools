@@ -69,9 +69,8 @@
   flex-direction: column;
   gap: var(--space-6);
   width: 100%;
-  max-width: var(--content-max);
   min-height: 100%;
-  margin: 0 auto;
+  /* 不设 max-width：拉宽浏览器时内容跟着铺开，左右只留固定 24px */
   padding: 20px 24px;
 }
 

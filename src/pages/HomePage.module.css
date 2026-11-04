@@ -7,8 +7,6 @@
   flex-wrap: wrap;
   gap: var(--space-3);
   width: 100%;
-  max-width: var(--content-max);
-  margin: 0 auto;
   padding: 9px 24px;
 }
 
