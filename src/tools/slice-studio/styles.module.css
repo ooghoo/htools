@@ -442,14 +442,18 @@
   width: 100%;
   min-width: 0;
   height: 100%;
+  /* 先整体清掉浏览器默认的 inset 边框，否则只覆盖左右会留下上深下浅的斜面 */
+  border: none;
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+  border-radius: 0;
   background: transparent;
   color: var(--foreground);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   text-align: center;
   outline: none;
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
