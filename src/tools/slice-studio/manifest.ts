@@ -3,7 +3,7 @@ import type { ToolMeta } from '@/types/tool'
 
 export const manifest: ToolMeta = {
   id: 'slice-studio',
-  name: 'Slice Studio',
+  name: '图片切割',
   description: '网格 / 自定义切割，实时预览并打包导出切片',
   pageDescription: '纯本地图片切割工作台 · 图片不会上传到任何服务器',
   category: 'image',

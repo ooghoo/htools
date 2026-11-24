@@ -37,7 +37,7 @@ export function EmptyImport({ dragOver, loading, error, onPick, onDismissError }
         </div>
 
         <div className={s['empty-copy']}>
-          <span className={s['empty-eyebrow']}>SLICE STUDIO</span>
+          <span className={s['empty-eyebrow']}>图片切割</span>
           <h2>{loading ? '正在读取图片…' : dragOver ? '松开即可导入' : '把图片放到这里'}</h2>
           <p>
             {loading

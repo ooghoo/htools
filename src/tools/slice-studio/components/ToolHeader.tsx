@@ -1,6 +1,5 @@
-import { FileArchive, ImagePlus, LockKeyhole, Scissors, Trash2 } from 'lucide-react'
+import { FileArchive, ImagePlus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { formatBytes, formatNumber } from '@/utils/format'
 import type { ImageSource } from '../types.ts'
 import s from '../styles.module.css'
 
@@ -13,6 +12,7 @@ interface ToolHeaderProps {
   onExport: () => void
 }
 
+/** 顶部只保留中文工具名与真实操作；图标、副标题、隐私标签和图片元信息已移除 */
 export function ToolHeader({
   source,
   count,
@@ -24,37 +24,12 @@ export function ToolHeader({
   return (
     <header className={s.header}>
       <div className={s['header-brand']}>
-        <span className={s['brand-mark']} aria-hidden="true">
-          <Scissors />
-        </span>
         <span className={s['brand-text']}>
-          <h1>Slice Studio</h1>
-          <p>图片切割工作台 · 纯本地处理</p>
+          <h1>图片切割</h1>
         </span>
       </div>
 
       <div className={s['header-right']}>
-        <span className={s['privacy-pill']} title="所有读取、切割、编码、打包都在浏览器内完成">
-          <LockKeyhole aria-hidden="true" />
-          仅本地处理
-        </span>
-
-        {source && (
-          <div className={s['source-meta']}>
-            <span className={s['source-name']} title={source.name}>
-              {source.name}
-            </span>
-            <span className={s['meta-sep']} aria-hidden="true" />
-            <span className={s['meta-mono']}>
-              {formatNumber(source.width)} × {formatNumber(source.height)}
-            </span>
-            <span className={s['meta-sep']} aria-hidden="true" />
-            <span className={s['meta-mono']}>{source.format}</span>
-            <span className={s['meta-sep']} aria-hidden="true" />
-            <span className={s['meta-mono']}>{formatBytes(source.size)}</span>
-          </div>
-        )}
-
         {source && (
           <>
             <Button size="sm" icon={ImagePlus} onClick={onPick}>

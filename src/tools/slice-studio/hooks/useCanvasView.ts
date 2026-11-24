@@ -70,8 +70,11 @@ export function useCanvasView(source: ImageSource | null) {
   sizeRef.current = size
   sourceRef.current = source
 
-  // 容器尺寸：ResizeObserver 比 window.resize 更可靠（侧栏开合也会触发）
+  // 容器尺寸：ResizeObserver 比 window.resize 更可靠（侧栏开合也会触发）。
+  // 关键：空状态下画布还没挂载，effect 必须等 source 出现后再绑定，否则尺寸永远是 0，
+  // 导入图片后会被画到屏幕外，看起来就是「预览区域空白」。
   useEffect(() => {
+    if (!source) return
     const element = stageRef.current
     if (!element) return
     const measure = () => {
@@ -82,7 +85,7 @@ export function useCanvasView(source: ImageSource | null) {
     const observer = new ResizeObserver(measure)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [source])
 
   // 换图后回到适应窗口
   useEffect(() => {
@@ -172,8 +175,10 @@ export function useCanvasView(source: ImageSource | null) {
     [],
   )
 
-  // 原生监听：React 的 onWheel 是被动监听，无法阻止页面滚动
+  // 原生监听：React 的 onWheel 是被动监听，无法阻止页面滚动。
+  // 同样等画布挂载后再绑定，否则导入图片后滚轮缩放不生效。
   useEffect(() => {
+    if (!source) return
     const element = stageRef.current
     if (!element) return
     const onWheel = (event: WheelEvent) => {
@@ -184,7 +189,7 @@ export function useCanvasView(source: ImageSource | null) {
     }
     element.addEventListener('wheel', onWheel, { passive: false })
     return () => element.removeEventListener('wheel', onWheel)
-  }, [zoomAtPoint])
+  }, [zoomAtPoint, source])
 
   return {
     stageRef,

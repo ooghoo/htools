@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { Crosshair, Download, Maximize2, Minus, Plus, RotateCcw, X } from 'lucide-react'
+import { formatBytes, formatNumber } from '@/utils/format'
 import { moveCut, regionAt } from '../lib/grid.ts'
 import type { CanvasView } from '../hooks/useCanvasView.ts'
 import type {
@@ -264,9 +265,17 @@ export function CanvasStage(props: CanvasStageProps) {
           </button>
         </div>
         <span className={s['toolbar-hint']}>滚轮缩放 · 拖拽平移 · 点击切片查看 · 双击重置</span>
-        <span className={s['toolbar-count']}>
+        <span className={s['toolbar-info']} title={`${source.name} · ${source.format} · ${formatBytes(source.size)}`}>
           <Maximize2 aria-hidden="true" />
-          {source.width} × {source.height} px
+          <span className={s['toolbar-file']}>{source.name}</span>
+          <span className={s['toolbar-sep']} aria-hidden="true" />
+          <span>
+            {formatNumber(source.width)} × {formatNumber(source.height)}
+          </span>
+          <span className={s['toolbar-sep']} aria-hidden="true" />
+          <span>{source.format}</span>
+          <span className={s['toolbar-sep']} aria-hidden="true" />
+          <span>{formatBytes(source.size)}</span>
         </span>
       </div>
 

@@ -210,7 +210,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 - 工具渲染异常会被 `ErrorBoundary` 拦住，只坏自己那一块；
 - 删掉一个工具 = 删目录 + 删注册表里那一行，其余不受影响。
 
-### 后台计算（Slice Studio）
+### 后台计算（图片切割）
 
 耗时任务放 Web Worker：用 `new Worker(new URL('./workers/xxx.ts', import.meta.url), { type: 'module' })`
 交给 Vite 单独打成一个 chunk，`base: './'` 下也能在 GitHub Pages 子路径正确加载。
@@ -309,7 +309,7 @@ npm run preview     # 打开 http://localhost:4173
 | 字节换算 | `bit` ~ `YB` 全单位表格式排列（默认 7 行到 `PB`，其余折叠），1024 / 1000 双列对照，小数位 2/4/6 可切，数值右侧悬停复制，本次会话历史（真实计算后才出现），常用对照说明 | `tools/byte-converter/logic.ts` |
 | Base64 编解码 | 文本与 Base64 双向转换，URL 安全变体、按 76 字符换行、UTF-8 自动识别；任意文件可拖入左栏 / 粘贴 / 选择上传后转 Base64（10 MB 上限） | `tools/base64/logic.ts` |
 | 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip；导出默认原图 / JPG / 100% | `tools/watermark/render.ts` |
-| Slice Studio | 纯本地图片切割工作台：网格等分 / 可拖动自定义切割线、画布缩放平移、切片编号与悬停高亮、PNG·JPG·WebP 导出、Worker 本地 ZIP 打包；[详细文档](src/tools/slice-studio/README.md) | `tools/slice-studio/lib/*.ts` + `workers/export.worker.ts` |
+| 图片切割 | 纯本地图片切割工作台：网格等分 / 可拖动自定义切割线、画布缩放平移、切片编号与悬停高亮、PNG·JPG·WebP 导出、Worker 本地 ZIP 打包；[详细文档](src/tools/slice-studio/README.md) | `tools/slice-studio/lib/*.ts` + `workers/export.worker.ts` |
 
 ---
 
@@ -342,9 +342,9 @@ npm run preview     # 打开 http://localhost:4173
 | 主题 | 切换深色后 `data-theme` 与 LocalStorage 同步 |
 | 运行时 | 全流程无 console error / page error |
 
-> 上面是历史验收（当时 6 个工具）。下面是新增 Slice Studio 的独立验收，两者不要混淆。
+> 上面是历史验收（当时 6 个工具）。下面是新增「图片切割」的独立验收，两者不要混淆。
 
-### Slice Studio 验收（2026-11-12）
+### 图片切割验收（2026-11-12）
 
 | 检查 | 方式 | 结果 |
 | --- | --- | --- |
@@ -366,7 +366,7 @@ npm run preview     # 打开 http://localhost:4173
 1. **只做纯静态**：没有后端、没有数据库、没有登录。需要服务端的工具（调用 API、存数据、OCR 之类）不适合放进这个仓库，要单独评估。
 2. **偏好不同步**：收藏与最近使用存在当前浏览器，换设备 / 换浏览器不共享。
 3. **图片水印的内存边界**：单张导出受 Canvas 上限约束（约 1677 万像素，超出会等比缩小）；一次导出很多张大会话内存占用高、速度变慢，这是浏览器本地处理的固有限制。
-4. **Slice Studio 的边界**：单文件 80 MB / 1 亿像素以内，单轴最多 20 段、总数最多 400 片；单个切片超过 1677 万像素会被拒绝并要求增加切割数量（不擅自缩放）。浏览器不支持 WebP 编码时会明确报错而不是静默导出 PNG。EXIF / ICC 元数据、动图逐帧、自由框选切片暂不支持。
+4. **图片切割的边界**：单文件 80 MB / 1 亿像素以内，单轴最多 20 段、总数最多 400 片；单个切片超过 1677 万像素会被拒绝并要求增加切割数量（不擅自缩放）。浏览器不支持 WebP 编码时会明确报错而不是静默导出 PNG。EXIF / ICC 元数据、动图逐帧、自由框选切片暂不支持。
 5. **JSON 大数字精度**：走 `JSON.parse`，超过 `2^53` 的整数会丢精度（与浏览器原生行为一致）。
 6. **时间戳用本机时区**：只有本地时间、UTC、ISO 三种视图，不做任意时区换算。
 7. **HashRouter 的 URL 带 `#`**：换来的是静态托管零配置，见上文取舍说明。

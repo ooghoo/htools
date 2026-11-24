@@ -55,7 +55,7 @@ export default function SliceStudio() {
   const [showNumbers, setShowNumbers] = useState(true)
   const [hovered, setHovered] = useState<number | null>(null)
   const [selected, setSelected] = useState<number | null>(null)
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
   const [dragOver, setDragOver] = useState(false)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
@@ -158,7 +158,7 @@ export default function SliceStudio() {
     setCustom({ xs: [], ys: [] })
     setSelected(null)
     setHovered(null)
-    setCollapsed(false)
+    setCollapsed(true)
   }, [clear, resetExport])
 
   const handleGridChange = useCallback(
@@ -302,6 +302,25 @@ export default function SliceStudio() {
           )}
 
           <div className={s.workbench}>
+            <CanvasStage
+              source={source}
+              regions={regions}
+              fileByIndex={fileByIndex}
+              view={view}
+              mode={mode}
+              custom={custom}
+              onCustomChange={handleCustomChange}
+              showLines={showLines}
+              showNumbers={showNumbers}
+              hovered={hovered}
+              selected={selected}
+              onHover={setHovered}
+              onSelect={setSelected}
+              onDownload={handleDownload}
+              downloadingId={downloadingId}
+              dragOver={dragOver}
+            />
+
             <SettingsPanel
               mode={mode}
               onModeChange={handleModeChange}
@@ -322,25 +341,6 @@ export default function SliceStudio() {
               rowSizes={rowSizes}
               firstFilename={files[0]?.filename ?? '—'}
               sourcePlaceholder={placeholder}
-            />
-
-            <CanvasStage
-              source={source}
-              regions={regions}
-              fileByIndex={fileByIndex}
-              view={view}
-              mode={mode}
-              custom={custom}
-              onCustomChange={handleCustomChange}
-              showLines={showLines}
-              showNumbers={showNumbers}
-              hovered={hovered}
-              selected={selected}
-              onHover={setHovered}
-              onSelect={setSelected}
-              onDownload={handleDownload}
-              downloadingId={downloadingId}
-              dragOver={dragOver}
             />
           </div>
 
