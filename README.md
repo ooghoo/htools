@@ -16,12 +16,13 @@ npm install
 
 npm run dev        # 本地开发，http://localhost:5173
 npm run typecheck  # 只跑类型检查
+npm run test       # 纯逻辑单元测试（Node 内置 test runner，含切割 / 编码 / ZIP）
 npm run build      # 类型检查 + 生产构建，产物在 dist/
 npm run preview    # 预览生产产物，http://localhost:4173
 npm run lint       # ESLint
 ```
 
-要求 Node 18+（CI 用 Node 20）。
+要求 Node 18+（CI 用 Node 20）；`npm test` 依赖 Node 22.18+ / Node 24 的原生 TS 类型擦除。
 
 ---
 
@@ -72,7 +73,14 @@ htools/
 │   │   ├── json-formatter/
 │   │   ├── timestamp-converter/
 │   │   ├── byte-converter/
-│   │   └── watermark/
+│   │   ├── watermark/
+│   │   └── slice-studio/          # 图片切割工作台
+│   │       ├── README.md          # 工具专属说明 / 测试结果 / 功能清单
+│   │       ├── components/        # UI 组件
+│   │       ├── hooks/             # 状态与交互逻辑
+│   │       ├── lib/               # 切割 / 编码 / 命名 / 导出算法 + *.test.ts
+│   │       ├── workers/           # 后台导出 Worker
+│   │       ├── manifest.ts, index.tsx, styles.module.css, types.ts
 │   ├── types/tool.ts
 │   ├── utils/
 │   └── main.tsx
@@ -202,6 +210,13 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
 - 工具渲染异常会被 `ErrorBoundary` 拦住，只坏自己那一块；
 - 删掉一个工具 = 删目录 + 删注册表里那一行，其余不受影响。
 
+### 后台计算（Slice Studio）
+
+耗时任务放 Web Worker：用 `new Worker(new URL('./workers/xxx.ts', import.meta.url), { type: 'module' })`
+交给 Vite 单独打成一个 chunk，`base: './'` 下也能在 GitHub Pages 子路径正确加载。
+Worker 只接收本地 `Blob` 与原图像素矩形；能力不足或线程加载失败时自动降级到主线程
+分批执行（每几张让出一次事件循环），并用 `AbortSignal` 支持取消与资源回收。
+
 ---
 
 ## 设计系统
@@ -294,6 +309,7 @@ npm run preview     # 打开 http://localhost:4173
 | 字节换算 | `bit` ~ `YB` 全单位表格式排列（默认 7 行到 `PB`，其余折叠），1024 / 1000 双列对照，小数位 2/4/6 可切，数值右侧悬停复制，本次会话历史（真实计算后才出现），常用对照说明 | `tools/byte-converter/logic.ts` |
 | Base64 编解码 | 文本与 Base64 双向转换，URL 安全变体、按 76 字符换行、UTF-8 自动识别；任意文件可拖入左栏 / 粘贴 / 选择上传后转 Base64（10 MB 上限） | `tools/base64/logic.ts` |
 | 图片水印 | 批量加水印，平铺 / 单个、角度、九宫格、字体字重字距、自动对比、描边投影、Logo 水印、按像素导出、多张打包 zip；导出默认原图 / JPG / 100% | `tools/watermark/render.ts` |
+| Slice Studio | 纯本地图片切割工作台：网格等分 / 可拖动自定义切割线、画布缩放平移、切片编号与悬停高亮、PNG·JPG·WebP 导出、Worker 本地 ZIP 打包；[详细文档](src/tools/slice-studio/README.md) | `tools/slice-studio/lib/*.ts` + `workers/export.worker.ts` |
 
 ---
 
@@ -305,7 +321,8 @@ npm run preview     # 打开 http://localhost:4173
 | --- | --- | --- |
 | TypeScript 类型检查 | `npm run typecheck` | ✅ 0 error |
 | ESLint | `npm run lint` | ✅ 0 problem |
-| 生产构建 | `npm run build` | ✅ 成功，首页 JS gzip ≈ 68 KB，工具按需分块 |
+| 纯逻辑单元测试 | `npm test` | ✅ 19 / 19 通过（切割 / 命名 / 编码 / ZIP） |
+| 生产构建 | `npm run build` | ✅ 成功，首页 JS gzip ≈ 70 KB，工具按需分块，Worker 独立产出 |
 | 预览产物 | `npm run preview` | ✅ 可访问 |
 
 浏览器交互验证（headless Chromium，1440×900，`dist` 产物）：**28 / 28 通过**
@@ -325,6 +342,23 @@ npm run preview     # 打开 http://localhost:4173
 | 主题 | 切换深色后 `data-theme` 与 LocalStorage 同步 |
 | 运行时 | 全流程无 console error / page error |
 
+> 上面是历史验收（当时 6 个工具）。下面是新增 Slice Studio 的独立验收，两者不要混淆。
+
+### Slice Studio 验收（2026-11-12）
+
+| 检查 | 方式 | 结果 |
+| --- | --- | --- |
+| 算法 / 命名 / 编码 / ZIP 单测 | `npm test` | ✅ 19 / 19 |
+| 组件渲染冒烟 | Vite SSR 渲染 6 个组件 | ✅ 6 / 6；9 个编号、9 张结果卡、详情卡、完成提示都在 |
+| Worker 端到端 | mock 画布跑完 6 张切片的编码 → ZIP → 解包 | ✅ 26 条进度、条目 01→06 有序、内容可读 |
+| 主线程降级端到端 | 隐藏 Worker 能力，1001×997 切 3×4 | ✅ 12 张、编号有序、进度 100%、铺满自检通过 |
+| 样式类名覆盖 | 静态比对 109 个 `s.*` 引用 | ✅ 无缺失、无冗余 |
+| 网络请求 | 全目录 grep + dev 模块转换检查 | ✅ 0 处网络调用；所有模块 200 |
+| 真实浏览器像素级验收 | 人工清单 | ⏳ 依赖浏览器原生 Canvas 编码，见 [工具文档](src/tools/slice-studio/README.md) 第六节 |
+
+完整测试结果、已实现 / 未实现清单、参考站点分析都在
+[`src/tools/slice-studio/README.md`](src/tools/slice-studio/README.md)。
+
 ---
 
 ## 已知限制
@@ -332,10 +366,11 @@ npm run preview     # 打开 http://localhost:4173
 1. **只做纯静态**：没有后端、没有数据库、没有登录。需要服务端的工具（调用 API、存数据、OCR 之类）不适合放进这个仓库，要单独评估。
 2. **偏好不同步**：收藏与最近使用存在当前浏览器，换设备 / 换浏览器不共享。
 3. **图片水印的内存边界**：单张导出受 Canvas 上限约束（约 1677 万像素，超出会等比缩小）；一次导出很多张大会话内存占用高、速度变慢，这是浏览器本地处理的固有限制。
-4. **JSON 大数字精度**：走 `JSON.parse`，超过 `2^53` 的整数会丢精度（与浏览器原生行为一致）。
-5. **时间戳用本机时区**：只有本地时间、UTC、ISO 三种视图，不做任意时区换算。
-6. **HashRouter 的 URL 带 `#`**：换来的是静态托管零配置，见上文取舍说明。
-7. **v1 旧链接失效**：`legacy/` 里的原静态站不再部署，`tools/xxx.html` 旧地址会 404，功能已迁移到新工具页。
+4. **Slice Studio 的边界**：单文件 80 MB / 1 亿像素以内，单轴最多 20 段、总数最多 400 片；单个切片超过 1677 万像素会被拒绝并要求增加切割数量（不擅自缩放）。浏览器不支持 WebP 编码时会明确报错而不是静默导出 PNG。EXIF / ICC 元数据、动图逐帧、自由框选切片暂不支持。
+5. **JSON 大数字精度**：走 `JSON.parse`，超过 `2^53` 的整数会丢精度（与浏览器原生行为一致）。
+6. **时间戳用本机时区**：只有本地时间、UTC、ISO 三种视图，不做任意时区换算。
+7. **HashRouter 的 URL 带 `#`**：换来的是静态托管零配置，见上文取舍说明。
+8. **v1 旧链接失效**：`legacy/` 里的原静态站不再部署，`tools/xxx.html` 旧地址会 404，功能已迁移到新工具页。
 
 ---
 

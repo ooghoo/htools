@@ -8,6 +8,7 @@ import { manifest as timestampConverter } from '@/tools/timestamp-converter/mani
 import { manifest as byteConverter } from '@/tools/byte-converter/manifest'
 import { manifest as base64 } from '@/tools/base64/manifest'
 import { manifest as watermark } from '@/tools/watermark/manifest'
+import { manifest as sliceStudio } from '@/tools/slice-studio/manifest'
 
 /**
  * ============================================================
@@ -28,6 +29,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   { ...byteConverter, component: lazy(() => import('@/tools/byte-converter')) },
   { ...base64, component: lazy(() => import('@/tools/base64')) },
   { ...watermark, component: lazy(() => import('@/tools/watermark')) },
+  { ...sliceStudio, component: lazy(() => import('@/tools/slice-studio')) },
 ]
 
 const CATEGORY_ORDER = new Map(CATEGORIES.map((category) => [category.id, category.order]))
